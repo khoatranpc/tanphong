@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React from 'react';
 import Doc from '../icons/Doc';
 import styles from './CardBoard.module.scss';
@@ -19,7 +19,12 @@ interface Props {
 }
 const CardBoard = (props: Props) => {
     return (
-        <div className={styles.cardBoard} onClick={() => { props.onClick?.() }}>
+        <div
+            className={styles.cardBoard}
+            onClick={() => {
+                props.onClick?.();
+            }}
+        >
             <div className={styles.icon}>{props.data.icon ? props.data.icon : <Doc className={styles.iconCard} />}</div>
             <div className={styles.contentCard}>
                 <p><b>Chức năng</b>: {props.data.title}</p>

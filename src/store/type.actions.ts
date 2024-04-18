@@ -1,0 +1,1 @@
+export const QUERY_EXAMPLE = 'QUERY_EXAMPLE';
