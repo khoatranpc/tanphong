@@ -1,3 +1,4 @@
+'use client'
 import React from 'react';
 import Doc from '../icons/Doc';
 import styles from './CardBoard.module.scss';
