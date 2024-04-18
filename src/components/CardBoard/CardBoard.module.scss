@@ -1,0 +1,36 @@
+.cardBoard {
+    width: 25%;
+    min-width: 20rem;
+    height: 20rem;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 1.8rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+
+    &:hover {
+        transform: scale(1.05);
+    }
+
+    .icon {
+        flex: 0.3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .contentCard {
+        flex: 0.7;
+        display: flex;
+        flex-direction: column;
+        gap: 1.8rem;
+
+        p {
+            font-size: 1.8rem;
+
+            &:first-child {
+                height: 35%;
+            }
+        }
+    }
+}
