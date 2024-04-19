@@ -42,7 +42,7 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
 }
 
 const LazyImportComponent = (directPages: string, options?: DynamicOptions<{}>) => {
-    return dynamic(() => import(`@/pages/${directPages}`), {
+    return dynamic(() => import(`@/screens/${directPages}`), {
         ...options,
         ssr: false,
     });

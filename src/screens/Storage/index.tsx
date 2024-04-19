@@ -32,7 +32,7 @@ const getStorages: Record<Storages, string> = {
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
 
-const Storage = () => {
+const StorageComponent = () => {
     const [typeStorage, setTypeStorage] = useState<Storages | string>('');
     const contractStorage = useContract();
     const serviceStorage = useService();
@@ -200,4 +200,4 @@ const Storage = () => {
     )
 }
 
-export default Storage;
+export default StorageComponent;
