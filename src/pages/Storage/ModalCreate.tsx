@@ -1,15 +1,16 @@
 import React from 'react';
-import { Storages } from '.';
 import { Form, Modal, ModalProps } from 'antd';
+import { Storages } from '.';
 
-interface Props extends ModalProps {
+interface Props {
     type: Storages;
+    modalProps: ModalProps;
 }
 
 const ModalCreate = (props: Props) => {
     return (
         <Modal
-            {...props}
+            {...props.modalProps}
         >
             <Form>
 
