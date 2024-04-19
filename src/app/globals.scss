@@ -21,6 +21,10 @@ body {
 }
 
 .container {
+  .paddingBase {
+    padding: 0 3.2rem;
+  }
+
   .logo {
     text-align: center;
 
@@ -28,4 +32,19 @@ body {
       max-width: 100%;
     }
   }
+
+  .main {
+    margin: auto;
+  }
+}
+
+
+.text-center,
+th.text-center {
+  text-align: center !important;
+}
+
+.text-right,
+th.text-right {
+  text-align: right !important;
 }

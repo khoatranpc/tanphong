@@ -3,6 +3,7 @@ import { AppDispatch, RootState } from "@/store";
 import rootReducer from "@/store/reducer"
 import { State } from "./redux-toolkit";
 import { Query } from "./axios";
+import dynamic, { DynamicOptions } from "next/dynamic";
 
 export interface RestQuery {
     get?: (query?: Query) => void;
@@ -40,6 +41,13 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
     }
 }
 
+const LazyImportComponent = (directPages: string, options?: DynamicOptions<{}>) => {
+    return dynamic(() => import(`@/pages/${directPages}`), {
+        ...options,
+        ssr: false,
+    });
+}
 export {
-    createHookReducer
+    createHookReducer,
+    LazyImportComponent
 }

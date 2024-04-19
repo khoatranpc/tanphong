@@ -56,7 +56,7 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                         (state as State).state = {
                             data: action.payload,
                             isLoading: false,
-                            success: false
+                            success: true
                         }
                     });
                     builder.addCase(request.rejected, (state, _) => {

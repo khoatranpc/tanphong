@@ -1,0 +1,29 @@
+.storage {
+    display: flex;
+    gap: 1.8rem;
+    height: 100%;
+
+    .setType {
+        width: 10%;
+        min-width: 20rem;
+        padding: 0 1.2rem;
+        border-right: 1px solid black;
+    }
+
+    .contentType {
+        flex: 1;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+
+        .actionData {
+            display: flex;
+            justify-content: space-between;
+
+            .search {
+                width: 32rem;
+            }
+        }
+    }
+}
