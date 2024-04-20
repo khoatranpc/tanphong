@@ -1,11 +1,13 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Input, Select, Table } from 'antd';
+import { v4 as uuid } from 'uuid';
 import { DefaultOptionType } from 'antd/es/select';
+import { Obj } from '@/global';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
 import { getColumns } from './config';
+import Modal from './Modal';
 import styles from './Storage.module.scss';
-import { Obj } from '@/global';
 
 export enum Storages {
     CONTRACT = 'CONTRACT',
@@ -19,21 +21,29 @@ export enum Storages {
     // loại tài sản
     T_PT = 'T_PT'
 }
-
-const getStorages: Record<Storages, string> = {
+export const getIdData: Record<Storages, string> = {
+    CONTRACT: 'id_hopdong',
+    CT_SV: 'id_hopdongdichvu',
+    PT: 'id_taisan',
+    SERVICE: 'id_dichvu',
+    T_PT: 'id_loaidichvu',
+    T_SV: 'id_loaitaisan'
+}
+const getStorages: Record<string, string> = {
     CONTRACT: 'Hợp đồng',
-    CT_SV: 'Hợp đồng - Dịch vụ',
     SERVICE: 'Dịch vụ',
     T_SV: 'Loại dịch vụ',
     PT: 'Tài sản',
     T_PT: 'Loại tài sản',
 }
 
+
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
 
 const StorageComponent = () => {
     const [typeStorage, setTypeStorage] = useState<Storages | string>('');
+    const componentId = useRef(uuid());
     const contractStorage = useContract();
     const serviceStorage = useService();
     const contractService = useContractService();
@@ -41,6 +51,24 @@ const StorageComponent = () => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
     const [searchValue, setSeachValue] = useState<string>('');
+    const [modal, setModal] = useState<{
+        open: boolean;
+        type: 'VIEW' | 'CREATE';
+        id?: string | number
+    }>({
+        open: false,
+        type: 'CREATE',
+        id: -1
+    });
+
+    const getTitleModal: Record<Storages, string> = {
+        CONTRACT: modal.type === 'CREATE' ? 'Tạo hợp đồng' : 'Thông tin hợp đồng',
+        SERVICE: modal.type === 'CREATE' ? 'Tạo dịch vụ' : ('Thông tin dịch vụ'),
+        CT_SV: modal.type === 'CREATE' ? 'Tạo Hợp đồng - Dịch vụ' : 'Cập nhật Hợp đồng - Dịch vụ',
+        PT: modal.type === 'CREATE' ? 'Tạo tài sản' : 'Cập nhật tài sản',
+        T_PT: modal.type === 'CREATE' ? 'Tạo loại tài sản' : 'Cập nhật loại tài sản',
+        T_SV: modal.type === 'CREATE' ? 'Tạo loại dịch vụ' : 'Cập nhật loại dịch vụ',
+    }
     const listTypeStorage: DefaultOptionType[] = Object.keys(getStorages).map((key) => {
         return {
             value: key,
@@ -104,61 +132,63 @@ const StorageComponent = () => {
         setSeachValue('');
         setTypeStorage(value);
     };
-    const handleCreateData = () => {
-        switch (typeStorage) {
-            case Storages.CONTRACT:
-                break;
-            case Storages.SERVICE:
-                break;
-            default:
-                break;
-        }
-    }
+    const handleModalData = (id?: string | number, type?: 'VIEW' | 'CREATE') => {
+        setModal({
+            open: true,
+            type: type ?? 'CREATE',
+            id
+        });
+    };
     useEffect(() => {
         switch (typeStorage) {
             case Storages.CONTRACT:
                 if (!contractStorage.state.data) {
-                    contractStorage.get?.();
+                    contractStorage.get?.(componentId.current);
+                }
+                if (!contractService.state.data) {
+                    contractService.get?.(componentId.current);
+                }
+                if (!serviceStorage.state.data) {
+                    serviceStorage.get?.(componentId.current);
                 }
                 break;
             case Storages.SERVICE:
                 if (!serviceStorage.state.data) {
-                    serviceStorage.get?.();
+                    serviceStorage.get?.(componentId.current);
                 }
                 if (!typeService.state.data) {
-                    typeService.get?.();
-                }
-                break;
-            case Storages.CT_SV:
-                if (!contractService.state.data) {
-                    contractService.get?.();
-                }
-                if (!contractStorage.state.data) {
-                    contractStorage.get?.();
-                }
-                if (!serviceStorage.state.data) {
-                    serviceStorage.get?.();
+                    typeService.get?.(componentId.current);
                 }
                 break;
             case Storages.T_SV:
                 if (!typeService.state.data) {
-                    typeService.get?.();
+                    typeService.get?.(componentId.current);
                 }
             case Storages.PT:
                 if (!propertyStorage.state.data) {
-                    propertyStorage.get?.();
+                    propertyStorage.get?.(componentId.current);
                 }
                 if (!typePropertyStorage.state.data) {
-                    typePropertyStorage.get?.();
+                    typePropertyStorage.get?.(componentId.current);
                 }
             case Storages.T_PT:
                 if (!typePropertyStorage.state.data) {
-                    typePropertyStorage.get?.();
+                    typePropertyStorage.get?.(componentId.current);
                 }
             default:
                 break;
         }
     }, [typeStorage]);
+    useEffect(() => {
+        switch (typeStorage) {
+            case Storages.CONTRACT:
+                console.log(componentId.current);
+                console.log(contractStorage.state.componentId);
+                break;
+            default:
+                break;
+        }
+    }, [typeStorage, contractStorage.state.data]);
     return (
         <div className={styles.storage}>
             <div className={styles.setType}>
@@ -184,18 +214,44 @@ const StorageComponent = () => {
                     />
                     <Button
                         disabled={getDisabled}
-                        onClick={handleCreateData}
+                        onClick={() => handleModalData()}
                     >
                         Tạo
                     </Button>
                 </div>
                 <Table
+                    className={styles.table}
                     bordered
                     dataSource={getDataSource}
                     loading={contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading}
                     columns={getColumns(typeStorage as Storages)}
+                    onRow={(data) => {
+                        return {
+                            onClick() {
+                                handleModalData(data[getIdData[typeStorage as Storages]], 'VIEW');
+                            }
+                        }
+                    }}
+                    rowClassName={styles.rowTable}
                 />
             </div>
+            {modal.open && <Modal
+                modalProps={{
+                    open: modal.open,
+                    centered: true,
+                    onCancel() {
+                        setModal({
+                            ...modal,
+                            open: false,
+                        });
+                    },
+                    title: <h2>{getTitleModal[typeStorage as Storages]}</h2>,
+                    wrapClassName: styles.modalStorage
+                }}
+                type={typeStorage as Storages}
+                id={modal.id}
+                typeModal={modal.type}
+            />}
         </div>
     )
 }

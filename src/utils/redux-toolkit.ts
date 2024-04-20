@@ -10,6 +10,7 @@ export interface State {
         isLoading: boolean;
         [k: string]: any;
         success: boolean;
+        componentId?: string;
     };
     [k: string]: any;
 }
@@ -27,10 +28,10 @@ const initState: State = {
 }
 
 export const createRequest = (type: string, api: string, method: Method): any => {
-    return createAsyncThunk(type, async (request: Query | any) => {
-        const rs = await actionRequest(api, method, request);
+    return createAsyncThunk(type, async ({ payload }: { payload: Query } | any) => {
+        const rs = await actionRequest(api, method, payload);
         return rs.data;
-    })
+    });
 }
 
 const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?: Array<(AsyncThunk<any, Action | undefined, any> | undefined | any)>) => {
@@ -45,29 +46,34 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
         ...asyncThunk ? {
             extraReducers(builder) {
                 asyncThunk.forEach(request => {
-                    builder.addCase(request.pending, (state, _) => {
+                    builder.addCase(request.pending, (state, action) => {
+                        const componentId = action.meta.arg.componentId;
                         (state as State).state = {
                             ...(state as State).state,
                             isLoading: true,
-                            success: false
+                            success: false,
+                            componentId
                         }
                     });
                     builder.addCase(request.fulfilled, (state, action) => {
+                        const componentId = action.meta.arg.componentId;
                         (state as State).state = {
                             data: action.payload,
                             isLoading: false,
-                            success: true
+                            success: true,
+                            componentId
                         }
                     });
-                    builder.addCase(request.rejected, (state, _) => {
+                    builder.addCase(request.rejected, (state, action) => {
+                        const componentId = action.meta.arg.componentId;
                         (state as State).state = {
                             data: null,
                             isLoading: false,
-                            success: false
+                            success: false,
+                            componentId
                         }
                     });
                 })
-
             },
         } : {},
     });

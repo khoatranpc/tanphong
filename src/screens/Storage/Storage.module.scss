@@ -27,3 +27,15 @@
         }
     }
 }
+
+.modalStorage {
+    >div:first-child {
+        width: 50vw !important;
+    }
+}
+
+.table {
+    tr {
+        cursor: pointer;
+    }
+}

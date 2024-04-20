@@ -1,8 +1,10 @@
+import React from "react";
 import { AnyObject } from "antd/es/_util/type";
 import { ColumnsType } from "antd/es/table";
-import { Storages } from ".";
+import { Storages, getIdData } from ".";
+import { Obj } from "@/global";
 
-const getColumns = (typeStorage: Storages): ColumnsType<AnyObject> => {
+const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): ColumnsType<AnyObject> => {
     switch (typeStorage) {
         case Storages.CONTRACT:
             return [
@@ -15,7 +17,7 @@ const getColumns = (typeStorage: Storages): ColumnsType<AnyObject> => {
                 {
                     key: 'name',
                     title: 'Khách hàng',
-                    dataIndex: 'ten'
+                    dataIndex: 'ten',
                 },
                 {
                     key: 'sohd',
@@ -52,7 +54,16 @@ const getColumns = (typeStorage: Storages): ColumnsType<AnyObject> => {
                     key: 'chuthich',
                     dataIndex: 'chuthich',
                     title: 'Chú thích'
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        render() {
+                            return actionCell
+                        }
+                    }
+                ] : []
             ];
         case Storages.SERVICE:
             return [
@@ -241,6 +252,13 @@ const getColumns = (typeStorage: Storages): ColumnsType<AnyObject> => {
 }
 
 
+const getDataDetail = (id?: string | number, listData?: Array<Obj>, typeStorage?: Storages, isGetAll?: boolean): any => {
+    const idField = getIdData[typeStorage!];
+    const data = listData?.[isGetAll ? 'filter' : 'find']((item) => item[idField] === id);
+    return data;
+}
+
 export {
     getColumns,
+    getDataDetail
 }
