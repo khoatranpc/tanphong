@@ -64,6 +64,7 @@ export default async function actionRequest(uri: string, method: Method, request
                 isLoading: false,
                 message: (error as Obj).message as string,
                 success: false,
+                data: null
             },
         }
     }

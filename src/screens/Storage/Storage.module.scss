@@ -30,12 +30,22 @@
 
 .modalStorage {
     >div:first-child {
-        width: 50vw !important;
+        width: 70vw !important;
     }
 }
 
 .table {
     tr {
         cursor: pointer;
+    }
+}
+
+.tableModal {
+    flex: 1;
+    display: flex;
+    gap: 1.8rem;
+
+    .table {
+        flex: 1;
     }
 }

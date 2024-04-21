@@ -1,9 +1,12 @@
 import { useDispatch, useSelector } from "react-redux"
 import dynamic, { DynamicOptions } from "next/dynamic";
+import { v4 as uuidFc } from 'uuid';
+import { Obj } from "@/global";
 import { AppDispatch, RootState } from "@/store";
 import rootReducer from "@/store/reducer"
 import { State } from "./redux-toolkit";
 import { Query } from "./axios";
+
 
 export interface RestQuery {
     get?: (componentId?: string, query?: Query) => void;
@@ -12,13 +15,24 @@ export interface RestQuery {
     delete?: (componentId?: string, query?: Query) => void;
 }
 
+export interface ResultHook extends RestQuery {
+    state: {
+        data: Obj | any;
+        isLoading: boolean;
+        [k: string]: any;
+        success: boolean;
+        componentId?: string;
+    };
+    clear: () => void;
+}
+
 const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
     get?: Function;
     post?: Function;
     put?: Function;
     delete?: Function;
 }, clearState?: Function) => {
-    return () => {
+    return (): ResultHook => {
         const dispatch = useDispatch<AppDispatch>();
         const data = useSelector((state: RootState) => (state[name] as State).state);
 
@@ -47,7 +61,10 @@ const LazyImportComponent = (directPages: string, options?: DynamicOptions<{}>) 
         ssr: false,
     });
 }
+
+const uuid = uuidFc;
 export {
     createHookReducer,
-    LazyImportComponent
+    LazyImportComponent,
+    uuid
 }

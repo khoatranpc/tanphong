@@ -1,8 +1,8 @@
 import React from "react";
 import { AnyObject } from "antd/es/_util/type";
 import { ColumnsType } from "antd/es/table";
-import { Storages, getIdData } from ".";
 import { Obj } from "@/global";
+import { Storages, getIdData } from "./StorageComponent";
 
 const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): ColumnsType<AnyObject> => {
     switch (typeStorage) {
@@ -59,6 +59,7 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                     {
                         key: 'action',
                         title: 'Hành động',
+                        width: 50,
                         render() {
                             return actionCell
                         }
@@ -159,7 +160,17 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                             className: 'text-left'
                         }
                     }
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        width: 50,
+                        render() {
+                            return actionCell
+                        }
+                    }
+                ] : []
             ];
         case Storages.T_SV:
             return [
@@ -180,7 +191,17 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                     key: 'chuthich',
                     dataIndex: 'chuthich',
                     title: 'Chú thích'
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        width: 50,
+                        render() {
+                            return actionCell
+                        }
+                    }
+                ] : []
             ];
         case Storages.PT:
             return [
@@ -224,7 +245,17 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                     key: 'chuthich',
                     dataIndex: 'chuthich',
                     title: 'Chú thích'
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        width: 50,
+                        render() {
+                            return actionCell
+                        }
+                    }
+                ] : []
             ];
         case Storages.T_PT:
             return [
@@ -244,7 +275,17 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                     key: 'chuthich',
                     dataIndex: 'chuthich',
                     title: 'Chú thích'
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        width: 50,
+                        render() {
+                            return actionCell
+                        }
+                    }
+                ] : []
             ];
         default:
             return [];
