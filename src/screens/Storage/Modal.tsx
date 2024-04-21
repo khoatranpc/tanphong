@@ -26,9 +26,14 @@ const schema: Record<Storages, Obj> = {
     },
     CT_SV: {},
     PT: {},
-    SERVICE: {},
+    SERVICE: {
+        tendichvu: yup.string().required('Chưa nhập tên dịch vụ!'),
+        id_loaidichvu: yup.string().required('Chưa có loại dịch vụ!')
+    },
     T_PT: {},
-    T_SV: {}
+    T_SV: {
+        tenloaidichvu: yup.string().required('Chưa nhập tên loại dịch vụ!')
+    }
 }
 const initvalues: Record<Storages, Obj> = {
     CONTRACT: {
@@ -41,11 +46,21 @@ const initvalues: Record<Storages, Obj> = {
         "ngayghi": new Date().toString(),
         contractServices: []
     },
+    SERVICE: {
+        id_loaidichvu: '',
+        chuthich: '',
+        tendichvu: ''
+    },
+    T_SV: {
+        chuthich: '',
+        tenloaidichvu: ''
+    },
     CT_SV: {},
     PT: {},
-    SERVICE: {},
-    T_PT: {},
-    T_SV: {}
+    T_PT: {
+        tenloaitaisan: '',
+        chuthich: ''
+    },
 }
 
 
@@ -80,13 +95,28 @@ const Modal = (props: Props) => {
                 })
             }
         },
+        SERVICE: () => {
+            const crrService = getDataDetail(props.id, serviceStorage.state.data as Array<any>, props.type);
+            return {
+                ...crrService,
+            }
+        },
+        T_SV: () => {
+            const crrTypeService = getDataDetail(props.id, typeService.state.data as Array<any>, props.type);
+            return {
+                ...crrTypeService
+            }
+        },
         CT_SV: () => ({}),
         PT: () => ({}),
-        SERVICE: () => ({}),
-        T_PT: () => ({}),
-        T_SV: () => ({})
+        T_PT: () => {
+            const crrTypePT = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, props.type);
+            return {
+                ...crrTypePT
+            }
+        },
     };
-    const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues } = useFormik({
+    const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues, setTouched } = useFormik({
         initialValues: props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type],
         validationSchema,
         onSubmit(values) {
@@ -102,14 +132,14 @@ const Modal = (props: Props) => {
                 },
                 dientich_soluong: 0,
                 dongia: 0,
-                chuthich: 'ahihi'
+                chuthich: ''
             };
             (values.contractServices as Obj[])?.push(newRecordCTSV);
             setValues({ ...values });
         }
     };
-    const formDate: Record<Storages, React.ReactNode> = {
-        CONTRACT: <>
+    const formData: Record<Storages, React.ReactNode> = {
+        CONTRACT: props.type === Storages.CONTRACT ? <>
             <Form.Item>
                 <label>Tên khách <span className='error'>*</span></label>
                 <Input size="small" name='ten' value={values.ten} onChange={handleChange} onBlur={handleBlur} />
@@ -242,7 +272,7 @@ const Modal = (props: Props) => {
                             }
                         }
                     })}
-                    dataSource={values.contractServices.map((item: Obj) => (item))}
+                    dataSource={values.contractServices?.map((item: Obj) => (item))}
                 />
                 <Button
                     size="small"
@@ -254,12 +284,77 @@ const Modal = (props: Props) => {
                     Thêm
                 </Button>
             </div>
-        </>,
-        CT_SV: <></>,
-        PT: <></>,
-        SERVICE: <></>,
-        T_PT: <></>,
-        T_SV: <></>
+        </> : <></>,
+        SERVICE: props.type === Storages.SERVICE ? <>
+            <Form.Item>
+                <label>Tên dịch vụ <span className='error'>*</span></label>
+                <Input size="small" value={values.tendichvu} name='tendichvu' onChange={handleChange} onBlur={handleBlur} />
+                {errors?.tendichvu && <p className="error">{errors?.tendichvu as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>Loại dịch vụ <span className='error'>*</span></label>
+                <br />
+                <Select
+                    size="small"
+                    filterOption={filterOptionSelect}
+                    showSearch
+                    style={{ minWidth: '15rem', width: 'fit-content' }}
+                    placeholder="Chọn loại dịch vụ"
+                    options={(typeService.state.data as Array<Obj>)?.map((sv) => {
+                        console.log(sv);
+                        return {
+                            label: sv.tenloaidichvu,
+                            value: sv.id_loaidichvu
+                        }
+                    })}
+                    value={values.id_loaidichvu}
+                    onBlur={() => {
+                        setTouched({
+                            ...touched,
+                            'id_loaidichvu': true
+                        });
+                    }}
+                    onChange={(value) => {
+                        setFieldValue('id_loaidichvu', value);
+                    }}
+                />
+                {errors?.id_loaidichvu && <p className="error">{errors?.id_loaidichvu as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>
+                    Chú thích
+                </label>
+                <Input.TextArea name='chuthich' onChange={handleChange} />
+            </Form.Item>
+        </> : <></>,
+        T_SV: props.type === Storages.T_SV ? <>
+            <Form.Item>
+                <label>Tên loại dịch vụ <span className='error'>*</span></label>
+                <Input size="small" value={values.tenloaidichvu} name='tenloaidichvu' onChange={handleChange} onBlur={handleBlur} />
+                {errors?.tenloaidichvu && <p className="error">{errors?.tenloaidichvu as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>
+                    Chú thích
+                </label>
+                <Input.TextArea name='chuthich' onChange={handleChange} />
+            </Form.Item>
+        </> : <></>,
+        CT_SV: props.type === Storages.CT_SV ? <></> : <></>,
+        PT: props.type === Storages.PT ? <></> : <></>,
+        T_PT: props.type === Storages.T_PT ? <>
+            <Form.Item>
+                <label>Tên loại tài sản <span className='error'>*</span></label>
+                <Input size="small" value={values.tenloaitaisan} name='tenloaitaisan' onChange={handleChange} onBlur={handleBlur} />
+                {errors?.tenloaitaisan && <p className="error">{errors?.tenloaitaisan as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>
+                    Chú thích
+                </label>
+                <Input.TextArea name='chuthich' onChange={handleChange} />
+            </Form.Item>
+        </> : <></>,
     };
     return (
         <ModalComponent
@@ -267,10 +362,11 @@ const Modal = (props: Props) => {
             onOk={() => {
                 handleSubmit();
             }}
+            okText="Lưu"
         >
             <Form
             >
-                {formDate[props.type]}
+                {formData[props.type]}
             </Form>
         </ModalComponent>
     )

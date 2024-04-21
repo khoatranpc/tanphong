@@ -26,11 +26,24 @@
             }
         }
     }
+
+    .groupBtn {
+        display: flex;
+        gap: 1.8rem;
+    }
 }
 
 .modalStorage {
     >div:first-child {
         width: 70vw !important;
+    }
+
+    &.SERVICE,
+    &.T_SV,
+    &.T_PT {
+        >div:first-child {
+            width: 30vw !important;
+        }
     }
 }
 

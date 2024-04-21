@@ -2,6 +2,7 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Button, Input, Select, Table } from 'antd';
 import { v4 as uuid } from 'uuid';
+import { ReloadOutlined } from '@ant-design/icons';
 import { DefaultOptionType } from 'antd/es/select';
 import { Obj } from '@/global';
 import { ResultHook } from '@/utils';
@@ -150,45 +151,74 @@ const StorageComponent = (props: Props) => {
             id
         });
     };
-    useEffect(() => {
+    const handleQueryData = (isReload?: boolean) => {
         switch (props.typeStorage) {
             case Storages.CONTRACT:
-                if (!contractStorage.state.data) {
+                if (isReload) {
                     contractStorage.get?.(componentId.current);
-                }
-                if (!contractService.state.data) {
                     contractService.get?.(componentId.current);
-                }
-                if (!serviceStorage.state.data) {
                     serviceStorage.get?.(componentId.current);
+                } else {
+
+                    if (!contractStorage.state.data) {
+                        contractStorage.get?.(componentId.current);
+                    }
+                    if (!contractService.state.data) {
+                        contractService.get?.(componentId.current);
+                    }
+                    if (!serviceStorage.state.data) {
+                        serviceStorage.get?.(componentId.current);
+                    }
                 }
                 break;
             case Storages.SERVICE:
-                if (!serviceStorage.state.data) {
+                if (isReload) {
                     serviceStorage.get?.(componentId.current);
-                }
-                if (!typeService.state.data) {
                     typeService.get?.(componentId.current);
+                } else {
+                    if (!serviceStorage.state.data) {
+                        serviceStorage.get?.(componentId.current);
+                    }
+                    if (!typeService.state.data) {
+                        typeService.get?.(componentId.current);
+                    }
                 }
                 break;
             case Storages.T_SV:
-                if (!typeService.state.data) {
+                if (isReload) {
                     typeService.get?.(componentId.current);
+                } else {
+                    if (!typeService.state.data) {
+                        typeService.get?.(componentId.current);
+                    }
                 }
             case Storages.PT:
-                if (!propertyStorage.state.data) {
+                if (isReload) {
                     propertyStorage.get?.(componentId.current);
-                }
-                if (!typePropertyStorage.state.data) {
                     typePropertyStorage.get?.(componentId.current);
+                } else {
+                    if (!propertyStorage.state.data) {
+                        propertyStorage.get?.(componentId.current);
+                    }
+                    if (!typePropertyStorage.state.data) {
+                        typePropertyStorage.get?.(componentId.current);
+                    }
                 }
             case Storages.T_PT:
-                if (!typePropertyStorage.state.data) {
+                if (isReload) {
                     typePropertyStorage.get?.(componentId.current);
+
+                } else {
+                    if (!typePropertyStorage.state.data) {
+                        typePropertyStorage.get?.(componentId.current);
+                    }
                 }
             default:
                 break;
         }
+    }
+    useEffect(() => {
+        handleQueryData();
     }, [props.typeStorage]);
     useEffect(() => {
         switch (props.typeStorage) {
@@ -223,12 +253,20 @@ const StorageComponent = (props: Props) => {
                             setSeachValue(e.target.value);
                         }}
                     />
-                    <Button
-                        disabled={getDisabled}
-                        onClick={() => handleModalData()}
-                    >
-                        Tạo
-                    </Button>
+                    <div className={styles.groupBtn}>
+                        <Button
+                            disabled={getDisabled}
+                            onClick={() => handleQueryData(true)}
+                        >
+                            <ReloadOutlined />
+                        </Button>
+                        <Button
+                            disabled={getDisabled}
+                            onClick={() => handleModalData()}
+                        >
+                            Tạo
+                        </Button>
+                    </div>
                 </div>
                 <Table
                     className={styles.table}
@@ -257,7 +295,7 @@ const StorageComponent = (props: Props) => {
                         });
                     },
                     title: <h2>{getTitleModal[props.typeStorage as Storages]}</h2>,
-                    wrapClassName: styles.modalStorage
+                    wrapClassName: `${styles.modalStorage} ${styles[props.typeStorage]}`
                 }}
                 type={props.typeStorage as Storages}
                 id={modal.id}
