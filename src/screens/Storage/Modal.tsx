@@ -368,7 +368,7 @@ const Modal = (props: Props) => {
     useEffect(() => {
         switch (props.type) {
             case Storages.CONTRACT:
-                if (contractStorage.state.componentId === componentId.current) {
+                if (contractStorage.state.componentId === componentId.current && contractStorage.state.success) {
                     props.closeModal();
                 }
                 break;

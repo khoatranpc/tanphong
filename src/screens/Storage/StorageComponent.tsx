@@ -305,6 +305,7 @@ const StorageComponent = (props: Props) => {
                         ...modal,
                         open: false,
                     });
+                    handleQueryData(true);
                 }}
             />}
         </div>
