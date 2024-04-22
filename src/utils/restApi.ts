@@ -2,11 +2,11 @@ import { Obj } from "@/global";
 import httpClient, { Query } from "./axios";
 import { Method } from 'axios';
 
-export default async function actionRequest(uri: string, method: Method, request?: Query) {
+export default async function actionRequest(uri: string, method: Method, { payload }: { payload: Query }) {
     try {
         let response;
         let parseUri = uri;
-        const listReqParams = request?.params;
+        const listReqParams = payload?.params;
         if (listReqParams && !parseUri.includes('$params')) {
             throw new Error('Missing $params item');
         }
@@ -17,7 +17,7 @@ export default async function actionRequest(uri: string, method: Method, request
         }
         switch (method) {
             case "GET":
-                response = httpClient.get(parseUri as string, { params: request?.params }).then(
+                response = httpClient.get(parseUri as string, { params: payload?.params }).then(
                     (response) => {
                         return response;
                     },
@@ -27,7 +27,7 @@ export default async function actionRequest(uri: string, method: Method, request
                 );
                 break;
             case "POST":
-                response = httpClient.post(parseUri as string, request?.body, { ...request?.headers ? { headers: request?.headers } : {} }).then(
+                response = httpClient.post(parseUri as string, payload?.body, { ...payload?.headers ? { headers: payload?.headers } : {} }).then(
                     (response) => {
                         return response;
                     },
@@ -37,7 +37,7 @@ export default async function actionRequest(uri: string, method: Method, request
                 );
                 break;
             case "PUT":
-                response = httpClient.put(parseUri as string, request?.body, { params: request?.params, ...request?.headers ? { headers: request?.headers } : {} }).then(
+                response = httpClient.put(parseUri as string, payload?.body, { params: payload?.params, ...payload?.headers ? { headers: payload?.headers } : {} }).then(
                     (response) => {
                         return response;
                     },
@@ -47,7 +47,7 @@ export default async function actionRequest(uri: string, method: Method, request
                 );
                 break;
             case "DELETE":
-                response = httpClient.delete(parseUri as string, { params: request?.queryParams }).then(
+                response = httpClient.delete(parseUri as string, { params: payload?.queryParams }).then(
                     (response) => {
                         return response;
                     },

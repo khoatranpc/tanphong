@@ -11,6 +11,7 @@ const Storage = () => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
     const [typeStorage, setTypeStorage] = useState<Storages | string>('');
+
     return (
         <StorageComponent
             contractStorage={contractStorage}

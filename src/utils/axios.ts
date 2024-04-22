@@ -2,7 +2,7 @@ import axios, { AxiosHeaders } from "axios";
 import { Obj } from "@/global";
 
 export interface Query {
-    body?: Obj;
+    body?: Obj | Array<any>;
     queryParams?: Obj;
     params?: string[];
     headers?: AxiosHeaders

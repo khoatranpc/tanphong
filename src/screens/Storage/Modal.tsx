@@ -1,20 +1,22 @@
+"use client";
 import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select } from 'antd';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Obj } from '@/global';
-import { uuid } from '@/utils';
+import { formatDateToString, uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
 import { getColumns, getDataDetail } from './config';
-import styles from './Storage.module.scss';
 import { Storages } from './StorageComponent';
+import styles from './Storage.module.scss';
 
 interface Props {
     modalProps: ModalProps;
     type: Storages;
     id?: string | number;
     typeModal: 'VIEW' | 'CREATE';
+    closeModal: () => void;
 }
 const schema: Record<Storages, Obj> = {
     CONTRACT: {
@@ -43,7 +45,7 @@ const initvalues: Record<Storages, Obj> = {
         "kythanhtoan_thang_lan_field": '',
         "tongthu": '',
         "chuthich": "",
-        "ngayghi": new Date().toString(),
+        "ngayghi": formatDateToString(new Date()),
         contractServices: []
     },
     SERVICE: {
@@ -71,6 +73,7 @@ const Modal = (props: Props) => {
     const validationSchema = yup.object({
         ...schema[props.type]
     });
+    const componentId = useRef(uuid());
     const contractStorage = useContract();
     const serviceStorage = useService();
     const contractService = useContractService();
@@ -120,7 +123,13 @@ const Modal = (props: Props) => {
         initialValues: props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type],
         validationSchema,
         onSubmit(values) {
-            console.log(values);
+            switch (props.type) {
+                case Storages.CONTRACT:
+                    contractStorage.post?.(componentId.current, {
+                        body: values
+                    });
+                    break;
+            }
         }
     });
     const handleCreateNewRowCTSV = () => {
@@ -356,6 +365,18 @@ const Modal = (props: Props) => {
             </Form.Item>
         </> : <></>,
     };
+    useEffect(() => {
+        switch (props.type) {
+            case Storages.CONTRACT:
+                if (contractStorage.state.componentId === componentId.current) {
+                    props.closeModal();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }, [props.type, contractStorage.state]);
     return (
         <ModalComponent
             {...props.modalProps}

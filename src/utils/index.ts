@@ -6,10 +6,11 @@ import { AppDispatch, RootState } from "@/store";
 import rootReducer from "@/store/reducer"
 import { State } from "./redux-toolkit";
 import { Query } from "./axios";
+import { format } from "date-fns";
 
 
 export interface RestQuery {
-    get?: (componentId?: string, query?: Query) => void;
+    get?: (componentId?: string, query?: Query, isReload?: boolean) => void;
     post?: (componentId?: string, query?: Query) => void;
     put?: (componentId?: string, query?: Query) => void;
     delete?: (componentId?: string, query?: Query) => void;
@@ -42,8 +43,8 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
         const query: RestQuery = {};
         for (const key in queryThunk) {
             if (Object.prototype.hasOwnProperty.call(queryThunk, key)) {
-                query[key as keyof RestQuery] = (componentId?: string, query?: Query) => {
-                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId }));
+                query[key as keyof RestQuery] = (componentId?: string, query?: Query, isReload?: boolean) => {
+                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId, isReload }));
                 }
             }
         }
@@ -61,10 +62,13 @@ const LazyImportComponent = (directPages: string, options?: DynamicOptions<{}>) 
         ssr: false,
     });
 }
-
+const formatDateToString = (date: Date, formatString?: string) => {
+    return format(date, formatString ?? 'yyyy-MM-dd');
+}
 const uuid = uuidFc;
 export {
     createHookReducer,
     LazyImportComponent,
-    uuid
+    uuid,
+    formatDateToString
 }

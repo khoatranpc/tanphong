@@ -28,7 +28,7 @@ const initState: State = {
 }
 
 export const createRequest = (type: string, api: string, method: Method): any => {
-    return createAsyncThunk(type, async ({ payload }: { payload: Query } | any) => {
+    return createAsyncThunk(type, async (payload: any) => {
         const rs = await actionRequest(api, method, payload);
         return rs.data;
     });
@@ -48,8 +48,9 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                 asyncThunk.forEach(request => {
                     builder.addCase(request.pending, (state, action) => {
                         const componentId = action.meta.arg.componentId;
+                        const isReload = action.meta.arg.isReload;
                         (state as State).state = {
-                            ...(state as State).state,
+                            ...!isReload ? (state as State).state : { data: null },
                             isLoading: true,
                             success: false,
                             componentId
