@@ -346,6 +346,13 @@ export default memo(StorageComponent, (prevProps, nextProps) => {
                 return false;
             }
             return true;
+        case Storages.T_PT:
+            if (!prevProps.typePropertyStorage.state.componentId) {
+                return false;
+            } else if (prevProps.typePropertyStorage.state.componentId && (prevProps.componentId === nextProps.typePropertyStorage.state.componentId)) {
+                return false;
+            }
+            return true;
         default:
             return true;
     }

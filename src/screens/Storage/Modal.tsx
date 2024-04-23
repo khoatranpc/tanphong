@@ -1,12 +1,12 @@
 "use client";
 import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker } from 'antd';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
 import dayjs from 'dayjs';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Obj } from '@/global';
-import { formatDateToString, toastify, uuid } from '@/utils';
+import { ResultHook, formatDateToString, toastify, uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
 import { getColumns, getDataDetail } from './config';
 import { Storages } from './StorageComponent';
@@ -52,7 +52,7 @@ const initvalues: Record<Storages, Obj> = {
         "kythanhtoan_thang_lan_field": '',
         "tongthu": '',
         "chuthich": "",
-        "ngayghi": new Date(),
+        "ngayghi": formatDateToString(new Date()),
         contractServices: []
     },
     SERVICE: {
@@ -82,6 +82,7 @@ const initvalues: Record<Storages, Obj> = {
 
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
+
 
 const Modal = (props: Props) => {
     const validationSchema = yup.object({
@@ -134,6 +135,20 @@ const Modal = (props: Props) => {
             }
         },
     };
+    const handleToast = (state: ResultHook, messageSuccessToast: string) => {
+        if (state.state.componentId === componentId.current && state.state.success) {
+            state.clear();
+            toastify(messageSuccessToast, {
+                type: 'success'
+            });
+            props.closeModal();
+        }
+        if (state.state.error) {
+            toastify(state.state.error, {
+                type: 'error'
+            });
+        }
+    };
     const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues, setTouched } = useFormik({
         initialValues: props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type],
         validationSchema,
@@ -167,6 +182,12 @@ const Modal = (props: Props) => {
                         });
                     }
                     break;
+                case Storages.T_PT:
+                    if (props.typeModal === 'CREATE') {
+                        typePropertyStorage.post?.(componentId.current, {
+                            body: values
+                        });
+                    }
             }
         }
     });
@@ -525,75 +546,38 @@ const Modal = (props: Props) => {
     useEffect(() => {
         if (props.type === Storages.CONTRACT) {
             if (props.typeModal === 'CREATE') {
-                if (contractService.state.componentId === componentId.current && contractService.state.success) {
-                    contractService.clear();
-                    toastify('Thêm hợp đồng thành công!', {
-                        type: 'success'
-                    });
-                    props.closeModal();
-                }
-                if (contractService.state.error) {
-                    toastify(contractService.state.error, {
-                        type: 'error'
-                    });
-                }
+                handleToast(contractService, 'Thêm hợp đồng thành công!');
             }
         }
     }, [props.type, contractService.state, props.typeModal]);
     useEffect(() => {
         if (props.type === Storages.SERVICE) {
             if (props.typeModal === 'CREATE') {
-                if (serviceStorage.state.componentId === componentId.current && serviceStorage.state.success) {
-                    serviceStorage.clear();
-                    toastify('Thêm dịch vụ thành công!', {
-                        type: 'success'
-                    });
-                    props.closeModal();
-                }
-                if (serviceStorage.state.error) {
-                    toastify(serviceStorage.state.error, {
-                        type: 'error'
-                    });
-                }
+                handleToast(serviceStorage, 'Thêm hợp đồng thành công!');
             }
         }
     }, [props.type, serviceStorage.state, props.typeModal]);
     useEffect(() => {
         if (props.type === Storages.T_SV) {
             if (props.typeModal === 'CREATE') {
-                if (typeService.state.componentId === componentId.current && typeService.state.success) {
-                    typeService.clear();
-                    toastify('Thêm loại dịch vụ thành công!', {
-                        type: 'success'
-                    });
-                    props.closeModal();
-                }
-                if (typeService.state.error) {
-                    toastify(typeService.state.error, {
-                        type: 'error'
-                    });
-                }
+                handleToast(typeService, 'Thêm loại dịch vụ thành công!');
             }
         }
     }, [props.type, typeService.state, props.typeModal]);
     useEffect(() => {
         if (props.type === Storages.PT) {
             if (props.typeModal === 'CREATE') {
-                if (propertyStorage.state.componentId === componentId.current && propertyStorage.state.success) {
-                    propertyStorage.clear();
-                    toastify('Thêm loại dịch vụ thành công!', {
-                        type: 'success'
-                    });
-                    props.closeModal();
-                }
-                if (propertyStorage.state.error) {
-                    toastify(propertyStorage.state.error, {
-                        type: 'error'
-                    });
-                }
+                handleToast(propertyStorage, 'Thêm tài sản thành công!');
             }
         }
     }, [props.type, propertyStorage.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.T_PT) {
+            if (props.typeModal === 'CREATE') {
+                handleToast(typePropertyStorage, 'Thêm loại tài sản thành công!');
+            }
+        }
+    }, [props.type, typePropertyStorage.state, props.typeModal]);
     return (
         <ModalComponent
             {...props.modalProps}
