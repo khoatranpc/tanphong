@@ -7,6 +7,7 @@ import rootReducer from "@/store/reducer"
 import { State } from "./redux-toolkit";
 import { Query } from "./axios";
 import { format } from "date-fns";
+import { ToastContent, ToastOptions, toast } from "react-toastify";
 
 
 export interface RestQuery {
@@ -23,6 +24,7 @@ export interface ResultHook extends RestQuery {
         [k: string]: any;
         success: boolean;
         componentId?: string;
+        error?: boolean;
     };
     clear: () => void;
 }
@@ -38,7 +40,9 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
         const data = useSelector((state: RootState) => (state[name] as State).state);
 
         const clear = () => {
-            dispatch(clearState?.());
+            if (clearState) {
+                dispatch(clearState?.());
+            }
         }
         const query: RestQuery = {};
         for (const key in queryThunk) {
@@ -66,9 +70,14 @@ const formatDateToString = (date: Date, formatString?: string) => {
     return format(date, formatString ?? 'yyyy-MM-dd');
 }
 const uuid = uuidFc;
+
+const toastify = (content: ToastContent<unknown>, options?: ToastOptions<unknown> | undefined) => {
+    return toast(content, options);
+}
 export {
     createHookReducer,
     LazyImportComponent,
     uuid,
-    formatDateToString
+    formatDateToString,
+    toastify
 }

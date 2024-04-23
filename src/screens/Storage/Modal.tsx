@@ -5,7 +5,7 @@ import { DefaultOptionType } from 'antd/es/select';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Obj } from '@/global';
-import { formatDateToString, uuid } from '@/utils';
+import { formatDateToString, toastify, uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
 import { getColumns, getDataDetail } from './config';
 import { Storages } from './StorageComponent';
@@ -81,6 +81,7 @@ const Modal = (props: Props) => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
 
+    const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
     const recordData: Record<Storages, () => Obj> = {
         CONTRACT: () => {
             const crrContract = getDataDetail(props.id, contractStorage.state.data as Array<any>, props.type);
@@ -365,18 +366,56 @@ const Modal = (props: Props) => {
             </Form.Item>
         </> : <></>,
     };
+    const handleQueryCreateContractService = () => {
+        const getContractId = contractStorage.state.data.id_hopdong;
+        const contractServices = (values.contractServices as Array<Obj>)?.map((item) => {
+            return {
+                ...item,
+                id_hopdong: getContractId,
+                id_dichvu: (item.id_dichvu as Obj)?.id_dichvu
+            }
+        });
+        if (contractServices.length !== 0) {
+            contractService.post?.(componentId.current, {
+                body: contractServices
+            });
+            contractStorage.clear();
+        } else {
+            props.closeModal();
+            toastify('Thêm hợp đồng thành công!', {
+                type: 'success'
+            });
+        }
+    }
     useEffect(() => {
         switch (props.type) {
             case Storages.CONTRACT:
-                if (contractStorage.state.componentId === componentId.current && contractStorage.state.success) {
-                    props.closeModal();
+                if (contractStorage.state.componentId === componentId.current && contractStorage.state.success && !contractService.state.error) {
+                    handleQueryCreateContractService();
                 }
-                break;
-
-            default:
-                break;
+                if (contractStorage.state.error) {
+                    toastify(contractStorage.state.error, {
+                        type: 'error'
+                    });
+                }
         }
     }, [props.type, contractStorage.state]);
+    useEffect(() => {
+        if (props.type === Storages.CONTRACT) {
+            if (contractService.state.componentId === componentId.current && contractService.state.success) {
+                contractService.clear();
+                toastify('Thêm hợp đồng thành công!', {
+                    type: 'success'
+                });
+                props.closeModal();
+            }
+            if (contractService.state.error) {
+                toastify(contractService.state.error, {
+                    type: 'error'
+                });
+            }
+        }
+    }, [props.type, contractService.state]);
     return (
         <ModalComponent
             {...props.modalProps}
@@ -384,6 +423,7 @@ const Modal = (props: Props) => {
                 handleSubmit();
             }}
             okText="Lưu"
+            confirmLoading={getLoading}
         >
             <Form
             >

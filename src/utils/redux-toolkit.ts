@@ -11,6 +11,7 @@ export interface State {
         [k: string]: any;
         success: boolean;
         componentId?: string;
+        error?: boolean;
     };
     [k: string]: any;
 }
@@ -71,7 +72,9 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                             data: null,
                             isLoading: false,
                             success: false,
-                            componentId
+                            componentId,
+                            error: true,
+                            message: 'Đã xảy ra lỗi, vui lòng thử lại sau!'
                         }
                     });
                 })

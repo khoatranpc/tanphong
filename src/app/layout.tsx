@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Provider } from "react-redux";
 import { store } from "@/store";
 import logo from '@/assets/imgs/logo.png';
+import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import "./globals.scss";
 
@@ -19,7 +20,9 @@ const WrappedPage = (props: { children: React.ReactNode }) => {
         <div className="main paddingBase">
           {props.children}
         </div>
+        <ToastContainer />
       </body>
+
     </html>
 
   )
