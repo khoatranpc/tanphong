@@ -26,8 +26,8 @@ export const getIdData: Record<Storages, string> = {
     CT_SV: 'id_hopdongdichvu',
     PT: 'id_taisan',
     SERVICE: 'id_dichvu',
-    T_PT: 'id_loaidichvu',
-    T_SV: 'id_loaitaisan'
+    T_PT: 'id_loaitaisan',
+    T_SV: 'id_loaidichvu'
 }
 const getStorages: Record<string, string> = {
     CONTRACT: 'Hợp đồng',

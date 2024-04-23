@@ -540,13 +540,17 @@ const Modal = (props: Props) => {
         if (props.type === Storages.CONTRACT) {
             if (props.typeModal === 'CREATE') {
                 handleToast(contractService, 'Thêm hợp đồng thành công!');
+            } else {
+                handleToast(contractService, 'Cập nhật hợp đồng thành công!');
             }
         }
     }, [props.type, contractService.state, props.typeModal]);
     useEffect(() => {
         if (props.type === Storages.SERVICE) {
             if (props.typeModal === 'CREATE') {
-                handleToast(serviceStorage, 'Thêm hợp đồng thành công!');
+                handleToast(serviceStorage, 'Thêm dịch vụ công!');
+            } else {
+                handleToast(serviceStorage, 'Cập nhật dịch vụ thành công!');
             }
         }
     }, [props.type, serviceStorage.state, props.typeModal]);
@@ -554,6 +558,8 @@ const Modal = (props: Props) => {
         if (props.type === Storages.T_SV) {
             if (props.typeModal === 'CREATE') {
                 handleToast(typeService, 'Thêm loại dịch vụ thành công!');
+            } else {
+                handleToast(typeService, 'Cập nhật loại dịch vụ thành công!');
             }
         }
     }, [props.type, typeService.state, props.typeModal]);
@@ -561,6 +567,8 @@ const Modal = (props: Props) => {
         if (props.type === Storages.PT) {
             if (props.typeModal === 'CREATE') {
                 handleToast(propertyStorage, 'Thêm tài sản thành công!');
+            } else {
+                handleToast(propertyStorage, 'Cập nhật tài sản thành công!');
             }
         }
     }, [props.type, propertyStorage.state, props.typeModal]);
@@ -568,6 +576,8 @@ const Modal = (props: Props) => {
         if (props.type === Storages.T_PT) {
             if (props.typeModal === 'CREATE') {
                 handleToast(typePropertyStorage, 'Thêm loại tài sản thành công!');
+            } else {
+                handleToast(typePropertyStorage, 'Cập nhật loại tài sản thành công!');
             }
         }
     }, [props.type, typePropertyStorage.state, props.typeModal]);
