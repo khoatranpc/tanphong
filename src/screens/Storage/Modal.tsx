@@ -1,7 +1,8 @@
 "use client";
-import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select } from 'antd';
+import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker } from 'antd';
 import React, { useEffect, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
+import dayjs from 'dayjs';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Obj } from '@/global';
@@ -27,7 +28,13 @@ const schema: Record<Storages, Obj> = {
         "tongthu": yup.number().required('Thiếu tổng tiền thu!'),
     },
     CT_SV: {},
-    PT: {},
+    PT: {
+        tentaisan: yup.string().required('Chưa nhập tên tài sản!'),
+        id_loaitaisan: yup.string().required('Chưa chọn loại tài sản!'),
+        "ngayghitang": yup.string().required('Chưa chọn ngày bắt đầu sử dụng!'),
+        "thoigiansudung": yup.number().required('Chưa nhập thời gian sử dụng (ngày)'),
+        "nguyengia": yup.number().required('Chưa nhập nguyên giá'),
+    },
     SERVICE: {
         tendichvu: yup.string().required('Chưa nhập tên dịch vụ!'),
         id_loaidichvu: yup.string().required('Chưa có loại dịch vụ!')
@@ -45,7 +52,7 @@ const initvalues: Record<Storages, Obj> = {
         "kythanhtoan_thang_lan_field": '',
         "tongthu": '',
         "chuthich": "",
-        "ngayghi": formatDateToString(new Date()),
+        "ngayghi": new Date(),
         contractServices: []
     },
     SERVICE: {
@@ -58,7 +65,14 @@ const initvalues: Record<Storages, Obj> = {
         tenloaidichvu: ''
     },
     CT_SV: {},
-    PT: {},
+    PT: {
+        tentaisan: '',
+        id_loaitaisan: '',
+        "ngayghitang": formatDateToString(new Date()),
+        "thoigiansudung": 0,
+        "nguyengia": 0,
+        "chuthich": '',
+    },
     T_PT: {
         tenloaitaisan: '',
         chuthich: ''
@@ -138,6 +152,21 @@ const Modal = (props: Props) => {
                             body: values
                         });
                     }
+                    break;
+                case Storages.T_SV:
+                    if (props.typeModal === 'CREATE') {
+                        typeService.post?.(componentId.current, {
+                            body: values
+                        });
+                    }
+                    break;
+                case Storages.PT:
+                    if (props.typeModal === 'CREATE') {
+                        propertyStorage.post?.(componentId.current, {
+                            body: values
+                        });
+                    }
+                    break;
             }
         }
     });
@@ -341,7 +370,7 @@ const Modal = (props: Props) => {
                 <label>
                     Chú thích
                 </label>
-                <Input.TextArea name='chuthich' onChange={handleChange} />
+                <Input.TextArea name='chuthich' onChange={handleChange} value={values.chuthich} />
             </Form.Item>
         </> : <></>,
         T_SV: props.type === Storages.T_SV ? <>
@@ -354,11 +383,95 @@ const Modal = (props: Props) => {
                 <label>
                     Chú thích
                 </label>
-                <Input.TextArea name='chuthich' onChange={handleChange} />
+                <Input.TextArea name='chuthich' onChange={handleChange} value={values.chuthich} />
             </Form.Item>
         </> : <></>,
         CT_SV: props.type === Storages.CT_SV ? <></> : <></>,
-        PT: props.type === Storages.PT ? <></> : <></>,
+        PT: props.type === Storages.PT ? <>
+            <Form.Item>
+                <label>Tên tài sản <span className='error'>*</span></label>
+                <Input size="small" value={values.tentaisan} name='tentaisan' onChange={handleChange} onBlur={handleBlur} />
+                {errors?.tentaisan && touched?.tentaisan && <p className="error">{errors?.tentaisan as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>Loại tài sản <span className='error'>*</span></label>
+                <br />
+                <Select
+                    size="small"
+                    filterOption={filterOptionSelect}
+                    showSearch
+                    style={{ minWidth: '15rem', width: 'fit-content' }}
+                    placeholder="Chọn loại dịch vụ"
+                    options={(typePropertyStorage.state.data as Array<Obj>)?.map((sv) => {
+                        return {
+                            label: sv.tenloaitaisan,
+                            value: sv.id_loaitaisan
+                        }
+                    })}
+                    value={values.id_loaitaisan}
+                    onBlur={() => {
+                        setTouched({
+                            ...touched,
+                            'id_loaitaisan': true
+                        });
+                    }}
+                    onChange={(value) => {
+                        setFieldValue('id_loaitaisan', value);
+                    }}
+                />
+                {errors?.id_loaitaisan && touched?.id_loaitaisan && <p className="error">{errors?.id_loaitaisan as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>Ngày bắt đầu sử dụng</label>
+                <br />
+                <DatePicker
+                    name='ngayghitang'
+                    size="small"
+                    format={'YYYY-MM-DD'}
+                    onBlur={() => {
+                        setTouched({
+                            ...touched,
+                            ngayghitang: true
+                        });
+                    }}
+                    value={dayjs(values.ngayghitang)}
+                    onChange={(day) => {
+                        const getDay = day ? day.toDate() : new Date();
+                        setFieldValue('ngayghitang', formatDateToString(getDay));
+                    }}
+                />
+                {errors?.ngayghitang && touched?.ngayghitang && <p className="error">{errors?.ngayghitang as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>Thời gian sử dụng (ngày)<span className='error'>*</span></label>
+                <Input type='number' size="small" value={values.thoigiansudung} name='thoigiansudung' onChange={handleChange} onBlur={handleBlur} />
+                {errors?.thoigiansudung && touched?.thoigiansudung && <p className="error">{errors?.thoigiansudung as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>Nguyên giá <span className='error'>*</span></label>
+                <br />
+                <InputNumber<number>
+                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
+                    onChange={(value) => {
+                        setFieldValue('nguyengia', value);
+                    }}
+                    name='nguyengia'
+                    value={values.nguyengia}
+                    size="small"
+                    onBlur={handleBlur}
+                    min={0}
+                    style={{ minWidth: '20rem' }}
+                />
+                {errors?.nguyengia && touched?.nguyengia && <p className="error">{errors?.nguyengia as string}</p>}
+            </Form.Item>
+            <Form.Item>
+                <label>
+                    Chú thích
+                </label>
+                <Input.TextArea name='chuthich' onChange={handleChange} value={values.chuthich} />
+            </Form.Item>
+        </> : <></>,
         T_PT: props.type === Storages.T_PT ? <>
             <Form.Item>
                 <label>Tên loại tài sản <span className='error'>*</span></label>
@@ -445,6 +558,42 @@ const Modal = (props: Props) => {
             }
         }
     }, [props.type, serviceStorage.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.T_SV) {
+            if (props.typeModal === 'CREATE') {
+                if (typeService.state.componentId === componentId.current && typeService.state.success) {
+                    typeService.clear();
+                    toastify('Thêm loại dịch vụ thành công!', {
+                        type: 'success'
+                    });
+                    props.closeModal();
+                }
+                if (typeService.state.error) {
+                    toastify(typeService.state.error, {
+                        type: 'error'
+                    });
+                }
+            }
+        }
+    }, [props.type, typeService.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.PT) {
+            if (props.typeModal === 'CREATE') {
+                if (propertyStorage.state.componentId === componentId.current && propertyStorage.state.success) {
+                    propertyStorage.clear();
+                    toastify('Thêm loại dịch vụ thành công!', {
+                        type: 'success'
+                    });
+                    props.closeModal();
+                }
+                if (propertyStorage.state.error) {
+                    toastify(propertyStorage.state.error, {
+                        type: 'error'
+                    });
+                }
+            }
+        }
+    }, [props.type, propertyStorage.state, props.typeModal]);
     return (
         <ModalComponent
             {...props.modalProps}

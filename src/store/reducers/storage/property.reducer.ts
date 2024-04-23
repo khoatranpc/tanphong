@@ -1,7 +1,11 @@
-import { PROPERTY_STORAGE } from "@/store/type.actions";
+import { PROPERTY_STORAGE, POST_PROPERTY_STORAGE } from "@/store/type.actions";
 import { createRequest, createSliceReducer } from "@/utils/redux-toolkit";
+import { createAction } from "@reduxjs/toolkit";
 
 export const queryGetPropertyStorage = createRequest(PROPERTY_STORAGE, '/taisan', 'GET');
-const propertyStorage = createSliceReducer('propertyStorage', undefined, [queryGetPropertyStorage]);
+export const queryPostPropertyStorage = createRequest(POST_PROPERTY_STORAGE, '/taisan', 'POST');
+const propertyStorage = createSliceReducer('propertyStorage', undefined, [queryGetPropertyStorage, queryPostPropertyStorage]);
+
+export const clearPropertyStorage = createAction<void, string>(`${propertyStorage.name}/clear`);
 
 export default propertyStorage.reducer;

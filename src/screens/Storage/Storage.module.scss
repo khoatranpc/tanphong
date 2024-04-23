@@ -40,7 +40,8 @@
 
     &.SERVICE,
     &.T_SV,
-    &.T_PT {
+    &.T_PT,
+    &.PT {
         >div:first-child {
             width: 30vw !important;
         }

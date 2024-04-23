@@ -64,7 +64,8 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                 isLoading: false,
                 message: (error as Obj).message as string,
                 success: false,
-                data: null
+                data: null,
+                error: true
             },
         }
     }

@@ -86,7 +86,6 @@ const StorageComponent = (props: Props) => {
             label: getStorages[key as Storages] as string
         }
     });
-    console.log(props.contractStorage.state);
     const data: Record<Storages, Array<any>> = {
         CONTRACT: contractStorage.state.data as Array<any> ?? [],
         CT_SV: contractService.state.data ? (contractService.state.data as Array<any>)?.map(item => {
@@ -330,6 +329,20 @@ export default memo(StorageComponent, (prevProps, nextProps) => {
             if (!prevProps.serviceStorage.state.componentId) {
                 return false;
             } else if (prevProps.serviceStorage.state.componentId && (prevProps.componentId === nextProps.serviceStorage.state.componentId)) {
+                return false;
+            }
+            return true;
+        case Storages.T_SV:
+            if (!prevProps.typeService.state.componentId) {
+                return false;
+            } else if (prevProps.typeService.state.componentId && (prevProps.componentId === nextProps.typeService.state.componentId)) {
+                return false;
+            }
+            return true;
+        case Storages.PT:
+            if (!prevProps.propertyStorage.state.componentId) {
+                return false;
+            } else if (prevProps.propertyStorage.state.componentId && (prevProps.componentId === nextProps.propertyStorage.state.componentId)) {
                 return false;
             }
             return true;

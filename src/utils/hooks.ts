@@ -3,8 +3,8 @@ import { clearContractStorage, queryGetContractStorage, queryPostContractStorage
 import { createHookReducer } from ".";
 import { clearServiceStorage, queryGetServiceStorage, queryPostServiceStorage } from "@/store/reducers/storage/service.reducer";
 import { clearContractServiceStorage, queryGetContractServiceStorage, queryPostContractServiceStorage } from "@/store/reducers/storage/contractService.reducer";
-import { queryGetTypeServiceStorage } from "@/store/reducers/storage/typeService.reducer";
-import { queryGetPropertyStorage } from "@/store/reducers/storage/property.reducer";
+import { clearTypeServiceStorage, queryGetTypeServiceStorage, queryPostTypeServiceStorage } from "@/store/reducers/storage/typeService.reducer";
+import { clearPropertyStorage, queryGetPropertyStorage, queryPostPropertyStorage } from "@/store/reducers/storage/property.reducer";
 import { queryGetTypePropertyStorage } from "@/store/reducers/storage/typeProperty.reducer";
 
 const useExample = createHookReducer('exampleReducer', {
@@ -27,12 +27,14 @@ const useContractService = createHookReducer('contractServiceStorage', {
 }, clearContractServiceStorage);
 
 const useTypeService = createHookReducer('typeServiceStorage', {
-    get: queryGetTypeServiceStorage
-});
+    get: queryGetTypeServiceStorage,
+    post: queryPostTypeServiceStorage
+}, clearTypeServiceStorage);
 
 const useProperty = createHookReducer('propertyStorage', {
-    get: queryGetPropertyStorage
-});
+    get: queryGetPropertyStorage,
+    post: queryPostPropertyStorage
+}, clearPropertyStorage);
 
 const useTypeProperty = createHookReducer('typePropertyStorage', {
     get: queryGetTypePropertyStorage
