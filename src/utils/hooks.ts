@@ -1,5 +1,5 @@
 import { QueryGetExample } from "@/store/reducers/example";
-import { clearContractStorage, queryGetContractStorage, queryPostContractStorage } from "@/store/reducers/storage/contract.reducer";
+import { clearContractStorage, queryGetContractStorage, queryPostContractStorage, queryPutContractStorage } from "@/store/reducers/storage/contract.reducer";
 import { createHookReducer } from ".";
 import { clearServiceStorage, queryGetServiceStorage, queryPostServiceStorage } from "@/store/reducers/storage/service.reducer";
 import { clearContractServiceStorage, queryGetContractServiceStorage, queryPostContractServiceStorage } from "@/store/reducers/storage/contractService.reducer";
@@ -13,7 +13,8 @@ const useExample = createHookReducer('exampleReducer', {
 
 const useContract = createHookReducer('contractStorage', {
     get: queryGetContractStorage,
-    post: queryPostContractStorage
+    post: queryPostContractStorage,
+    put: queryPutContractStorage
 }, clearContractStorage);
 
 const useService = createHookReducer('serviceStorage', {

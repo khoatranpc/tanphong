@@ -293,9 +293,16 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
 }
 
 
+export const getNameState: Record<any, string> = {
+    CONTRACT: 'contractStorage',
+    SERVICE: 'serviceStorage',
+    T_SV: 'typeService',
+    PT: 'propertyStorage',
+    T_PT: 'typePropertyStorage'
+};
 const getDataDetail = (id?: string | number, listData?: Array<Obj>, typeStorage?: Storages, isGetAll?: boolean): any => {
     const idField = getIdData[typeStorage!];
-    const data = listData?.[isGetAll ? 'filter' : 'find']((item) => item[idField] === id);
+    const data = listData?.[isGetAll ? 'filter' : 'find']?.((item) => item[idField] === id);
     return data;
 }
 

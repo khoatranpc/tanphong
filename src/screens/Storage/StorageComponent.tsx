@@ -5,7 +5,7 @@ import { ReloadOutlined } from '@ant-design/icons';
 import { DefaultOptionType } from 'antd/es/select';
 import { Obj } from '@/global';
 import { ResultHook } from '@/utils';
-import { getColumns } from './config';
+import { getColumns, getNameState } from './config';
 import Modal from './Modal';
 import styles from './Storage.module.scss';
 
@@ -42,7 +42,7 @@ const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
 
 
-interface Props {
+export interface StorageComponentProps {
     contractStorage: ResultHook;
     serviceStorage: ResultHook;
     contractService: ResultHook;
@@ -53,7 +53,7 @@ interface Props {
     setTypeStorage: React.Dispatch<React.SetStateAction<any>>;
     componentId: string;
 }
-const StorageComponent = (props: Props) => {
+const StorageComponent = (props: StorageComponentProps) => {
 
     const contractStorage = props.contractStorage;
     const serviceStorage = props.serviceStorage;
@@ -311,49 +311,18 @@ const StorageComponent = (props: Props) => {
     )
 }
 
-export default memo(StorageComponent, (prevProps, nextProps) => {
+export default memo(StorageComponent, (prevProps: StorageComponentProps, nextProps: StorageComponentProps) => {
     const getPrevTypeStorage = prevProps.typeStorage;
     const getNextTypeStorage = nextProps.typeStorage;
     if (getPrevTypeStorage !== getNextTypeStorage) {
         return false;
     }
-    switch (getNextTypeStorage) {
-        case Storages.CONTRACT:
-            if (!prevProps.contractStorage.state.componentId) {
-                return false;
-            } else if (prevProps.contractStorage.state.componentId && (prevProps.componentId === nextProps.contractStorage.state.componentId)) {
-                return false;
-            }
-            return true;
-        case Storages.SERVICE:
-            if (!prevProps.serviceStorage.state.componentId) {
-                return false;
-            } else if (prevProps.serviceStorage.state.componentId && (prevProps.componentId === nextProps.serviceStorage.state.componentId)) {
-                return false;
-            }
-            return true;
-        case Storages.T_SV:
-            if (!prevProps.typeService.state.componentId) {
-                return false;
-            } else if (prevProps.typeService.state.componentId && (prevProps.componentId === nextProps.typeService.state.componentId)) {
-                return false;
-            }
-            return true;
-        case Storages.PT:
-            if (!prevProps.propertyStorage.state.componentId) {
-                return false;
-            } else if (prevProps.propertyStorage.state.componentId && (prevProps.componentId === nextProps.propertyStorage.state.componentId)) {
-                return false;
-            }
-            return true;
-        case Storages.T_PT:
-            if (!prevProps.typePropertyStorage.state.componentId) {
-                return false;
-            } else if (prevProps.typePropertyStorage.state.componentId && (prevProps.componentId === nextProps.typePropertyStorage.state.componentId)) {
-                return false;
-            }
-            return true;
-        default:
-            return true;
+
+    const getState = getNameState[getNextTypeStorage as any] as keyof StorageComponentProps;
+    if (!(prevProps[getState] as ResultHook).state.componentId) {
+        return false;
+    } else if ((prevProps[getState] as ResultHook).state.componentId && (prevProps.componentId === (nextProps[getState] as ResultHook).state.componentId)) {
+        return false;
     }
+    return true;
 });

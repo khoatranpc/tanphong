@@ -1,6 +1,6 @@
 "use client";
 import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker } from 'antd';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
 import dayjs from 'dayjs';
 import * as yup from 'yup';
@@ -84,6 +84,14 @@ const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
 
 
+const disabledUpdate = (prevData: any, nextData: any) => {
+    return JSON.stringify(prevData) === JSON.stringify(nextData);
+}
+
+const getMethod = (typeModal: 'CREATE' | 'VIEW') => {
+    return typeModal === 'VIEW' ? 'put' : 'post'
+}
+
 const Modal = (props: Props) => {
     const validationSchema = yup.object({
         ...schema[props.type]
@@ -96,6 +104,14 @@ const Modal = (props: Props) => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
 
+    const dataState: Record<Storages, ResultHook> = {
+        CONTRACT: contractStorage,
+        SERVICE: serviceStorage,
+        CT_SV: contractService,
+        T_SV: typeService,
+        PT: propertyStorage,
+        T_PT: typePropertyStorage,
+    }
     const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
     const recordData: Record<Storages, () => Obj> = {
         CONTRACT: () => {
@@ -150,46 +166,19 @@ const Modal = (props: Props) => {
             state.clear();
         }
     };
+    const dataPrev = useMemo(() => {
+        return props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type]
+    }, [props.typeModal]);
     const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues, setTouched } = useFormik({
         initialValues: props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type],
         validationSchema,
         onSubmit(values) {
-            switch (props.type) {
-                case Storages.CONTRACT:
-                    if (props.typeModal === 'CREATE') {
-                        contractStorage.post?.(componentId.current, {
-                            body: values
-                        });
-                    }
-                    break;
-                case Storages.SERVICE:
-                    if (props.typeModal === 'CREATE') {
-                        serviceStorage.post?.(componentId.current, {
-                            body: values
-                        });
-                    }
-                    break;
-                case Storages.T_SV:
-                    if (props.typeModal === 'CREATE') {
-                        typeService.post?.(componentId.current, {
-                            body: values
-                        });
-                    }
-                    break;
-                case Storages.PT:
-                    if (props.typeModal === 'CREATE') {
-                        propertyStorage.post?.(componentId.current, {
-                            body: values
-                        });
-                    }
-                    break;
-                case Storages.T_PT:
-                    if (props.typeModal === 'CREATE') {
-                        typePropertyStorage.post?.(componentId.current, {
-                            body: values
-                        });
-                    }
-            }
+            dataState[props.type][getMethod(props.typeModal)]?.(componentId.current, {
+                body: values,
+                ...props.typeModal === 'VIEW' ? {
+                    params: [props.id as string]
+                } : {}
+            });
         }
     });
     const handleCreateNewRowCTSV = () => {
@@ -542,6 +531,9 @@ const Modal = (props: Props) => {
                         });
                     }
                 }
+                if (props.typeModal === 'VIEW') {
+                    handleToast(contractStorage, 'Cập nhật thành công!');
+                }
         }
     }, [props.type, contractStorage.state, props.typeModal]);
     useEffect(() => {
@@ -587,12 +579,15 @@ const Modal = (props: Props) => {
             }}
             okText="Lưu"
             confirmLoading={getLoading}
+            okButtonProps={{
+                disabled: disabledUpdate(dataPrev, values)
+            }}
         >
             <Form
             >
                 {formData[props.type]}
             </Form>
-        </ModalComponent>
+        </ModalComponent >
     )
 }
 
