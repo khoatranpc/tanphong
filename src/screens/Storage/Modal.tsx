@@ -143,7 +143,14 @@ const Modal = (props: Props) => {
             }
         },
         CT_SV: () => ({}),
-        PT: () => ({}),
+        PT: () => {
+            const crrPt = getDataDetail(props.id, propertyStorage.state.data as Array<any>, props.type);
+            const crrTypePt = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, Storages.T_PT);
+            return {
+                ...crrPt,
+                id_loaitaisan: crrTypePt.id_loaitaisan
+            }
+        },
         T_PT: () => {
             const crrTypePT = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, props.type);
             return {
