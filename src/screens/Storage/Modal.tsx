@@ -1,6 +1,6 @@
 "use client";
 import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker } from 'antd';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
 import dayjs from 'dayjs';
 import * as yup from 'yup';
@@ -147,6 +147,7 @@ const Modal = (props: Props) => {
             toastify(state.state.error, {
                 type: 'error'
             });
+            state.clear();
         }
     };
     const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues, setTouched } = useFormik({
