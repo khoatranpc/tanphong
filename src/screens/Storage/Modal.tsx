@@ -390,32 +390,36 @@ const Modal = (props: Props) => {
     useEffect(() => {
         switch (props.type) {
             case Storages.CONTRACT:
-                if (contractStorage.state.componentId === componentId.current && contractStorage.state.success && !contractService.state.error) {
-                    handleQueryCreateContractService();
+                if (props.typeModal === 'CREATE') {
+                    if (contractStorage.state.componentId === componentId.current && contractStorage.state.success && !contractService.state.error) {
+                        handleQueryCreateContractService();
+                    }
+                    if (contractStorage.state.error) {
+                        toastify(contractStorage.state.error, {
+                            type: 'error'
+                        });
+                    }
                 }
-                if (contractStorage.state.error) {
-                    toastify(contractStorage.state.error, {
+        }
+    }, [props.type, contractStorage.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.CONTRACT) {
+            if (props.typeModal === 'CREATE') {
+                if (contractService.state.componentId === componentId.current && contractService.state.success) {
+                    contractService.clear();
+                    toastify('Thêm hợp đồng thành công!', {
+                        type: 'success'
+                    });
+                    props.closeModal();
+                }
+                if (contractService.state.error) {
+                    toastify(contractService.state.error, {
                         type: 'error'
                     });
                 }
-        }
-    }, [props.type, contractStorage.state]);
-    useEffect(() => {
-        if (props.type === Storages.CONTRACT) {
-            if (contractService.state.componentId === componentId.current && contractService.state.success) {
-                contractService.clear();
-                toastify('Thêm hợp đồng thành công!', {
-                    type: 'success'
-                });
-                props.closeModal();
-            }
-            if (contractService.state.error) {
-                toastify(contractService.state.error, {
-                    type: 'error'
-                });
             }
         }
-    }, [props.type, contractService.state]);
+    }, [props.type, contractService.state, props.typeModal]);
     return (
         <ModalComponent
             {...props.modalProps}
