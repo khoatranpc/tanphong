@@ -1,7 +1,6 @@
 "use client";
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Button, Input, Select, Table } from 'antd';
-import { v4 as uuid } from 'uuid';
 import { ReloadOutlined } from '@ant-design/icons';
 import { DefaultOptionType } from 'antd/es/select';
 import { Obj } from '@/global';
@@ -34,7 +33,7 @@ const getStorages: Record<string, string> = {
     CONTRACT: 'Hợp đồng',
     SERVICE: 'Dịch vụ',
     T_SV: 'Loại dịch vụ',
-    // PT: 'Tài sản',
+    PT: 'Tài sản',
     T_PT: 'Loại tài sản',
 }
 
@@ -52,10 +51,10 @@ interface Props {
     typePropertyStorage: ResultHook;
     typeStorage: Storages | string;
     setTypeStorage: React.Dispatch<React.SetStateAction<any>>;
+    componentId: string;
 }
 const StorageComponent = (props: Props) => {
 
-    const componentId = useRef(uuid());
     const contractStorage = props.contractStorage;
     const serviceStorage = props.serviceStorage;
     const contractService = props.contractService;
@@ -87,6 +86,7 @@ const StorageComponent = (props: Props) => {
             label: getStorages[key as Storages] as string
         }
     });
+    console.log(props.contractStorage.state);
     const data: Record<Storages, Array<any>> = {
         CONTRACT: contractStorage.state.data as Array<any> ?? [],
         CT_SV: contractService.state.data ? (contractService.state.data as Array<any>)?.map(item => {
@@ -155,62 +155,62 @@ const StorageComponent = (props: Props) => {
         switch (props.typeStorage) {
             case Storages.CONTRACT:
                 if (isReload) {
-                    contractStorage.get?.(componentId.current, undefined, isReload);
-                    contractService.get?.(componentId.current, undefined, isReload);
-                    serviceStorage.get?.(componentId.current, undefined, isReload);
+                    contractStorage.get?.(props.componentId, undefined, isReload);
+                    contractService.get?.(props.componentId, undefined, isReload);
+                    serviceStorage.get?.(props.componentId, undefined, isReload);
                 } else {
 
                     if (!contractStorage.state.data) {
-                        contractStorage.get?.(componentId.current, undefined, isReload);
+                        contractStorage.get?.(props.componentId, undefined, isReload);
                     }
                     if (!contractService.state.data) {
-                        contractService.get?.(componentId.current, undefined, isReload);
+                        contractService.get?.(props.componentId, undefined, isReload);
                     }
                     if (!serviceStorage.state.data) {
-                        serviceStorage.get?.(componentId.current, undefined, isReload);
+                        serviceStorage.get?.(props.componentId, undefined, isReload);
                     }
                 }
                 break;
             case Storages.SERVICE:
                 if (isReload) {
-                    serviceStorage.get?.(componentId.current, undefined, isReload);
-                    typeService.get?.(componentId.current, undefined, isReload);
+                    serviceStorage.get?.(props.componentId, undefined, isReload);
+                    typeService.get?.(props.componentId, undefined, isReload);
                 } else {
                     if (!serviceStorage.state.data) {
-                        serviceStorage.get?.(componentId.current, undefined, isReload);
+                        serviceStorage.get?.(props.componentId, undefined, isReload);
                     }
                     if (!typeService.state.data) {
-                        typeService.get?.(componentId.current, undefined, isReload);
+                        typeService.get?.(props.componentId, undefined, isReload);
                     }
                 }
                 break;
             case Storages.T_SV:
                 if (isReload) {
-                    typeService.get?.(componentId.current, undefined, isReload);
+                    typeService.get?.(props.componentId, undefined, isReload);
                 } else {
                     if (!typeService.state.data) {
-                        typeService.get?.(componentId.current, undefined, isReload);
+                        typeService.get?.(props.componentId, undefined, isReload);
                     }
                 }
             case Storages.PT:
                 if (isReload) {
-                    propertyStorage.get?.(componentId.current, undefined, isReload);
-                    typePropertyStorage.get?.(componentId.current, undefined, isReload);
+                    propertyStorage.get?.(props.componentId, undefined, isReload);
+                    typePropertyStorage.get?.(props.componentId, undefined, isReload);
                 } else {
                     if (!propertyStorage.state.data) {
-                        propertyStorage.get?.(componentId.current, undefined, isReload);
+                        propertyStorage.get?.(props.componentId, undefined, isReload);
                     }
                     if (!typePropertyStorage.state.data) {
-                        typePropertyStorage.get?.(componentId.current, undefined, isReload);
+                        typePropertyStorage.get?.(props.componentId, undefined, isReload);
                     }
                 }
             case Storages.T_PT:
                 if (isReload) {
-                    typePropertyStorage.get?.(componentId.current, undefined, isReload);
+                    typePropertyStorage.get?.(props.componentId, undefined, isReload);
 
                 } else {
                     if (!typePropertyStorage.state.data) {
-                        typePropertyStorage.get?.(componentId.current, undefined, isReload);
+                        typePropertyStorage.get?.(props.componentId, undefined, isReload);
                     }
                 }
             default:
@@ -223,7 +223,7 @@ const StorageComponent = (props: Props) => {
     useEffect(() => {
         switch (props.typeStorage) {
             case Storages.CONTRACT:
-                // console.log(componentId.current);
+                // console.log(props.componentId);
                 // console.log(contractStorage.state.componentId);
                 break;
             default:
@@ -313,7 +313,6 @@ const StorageComponent = (props: Props) => {
 }
 
 export default memo(StorageComponent, (prevProps, nextProps) => {
-    // check contract
     const getPrevTypeStorage = prevProps.typeStorage;
     const getNextTypeStorage = nextProps.typeStorage;
     if (getPrevTypeStorage !== getNextTypeStorage) {
@@ -323,9 +322,17 @@ export default memo(StorageComponent, (prevProps, nextProps) => {
         case Storages.CONTRACT:
             if (!prevProps.contractStorage.state.componentId) {
                 return false;
-            } else if (prevProps.contractStorage.state.componentId && (prevProps.contractStorage.state.componentId === nextProps.contractStorage.state.componentId)) {
+            } else if (prevProps.contractStorage.state.componentId && (prevProps.componentId === nextProps.contractStorage.state.componentId)) {
                 return false;
             }
+            return true;
+        case Storages.SERVICE:
+            if (!prevProps.serviceStorage.state.componentId) {
+                return false;
+            } else if (prevProps.serviceStorage.state.componentId && (prevProps.componentId === nextProps.serviceStorage.state.componentId)) {
+                return false;
+            }
+            return true;
         default:
             return true;
     }

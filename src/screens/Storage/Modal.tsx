@@ -126,10 +126,18 @@ const Modal = (props: Props) => {
         onSubmit(values) {
             switch (props.type) {
                 case Storages.CONTRACT:
-                    contractStorage.post?.(componentId.current, {
-                        body: values
-                    });
+                    if (props.typeModal === 'CREATE') {
+                        contractStorage.post?.(componentId.current, {
+                            body: values
+                        });
+                    }
                     break;
+                case Storages.SERVICE:
+                    if (props.typeModal === 'CREATE') {
+                        serviceStorage.post?.(componentId.current, {
+                            body: values
+                        });
+                    }
             }
         }
     });
@@ -299,7 +307,7 @@ const Modal = (props: Props) => {
             <Form.Item>
                 <label>Tên dịch vụ <span className='error'>*</span></label>
                 <Input size="small" value={values.tendichvu} name='tendichvu' onChange={handleChange} onBlur={handleBlur} />
-                {errors?.tendichvu && <p className="error">{errors?.tendichvu as string}</p>}
+                {errors?.tendichvu && touched?.tendichvu && <p className="error">{errors?.tendichvu as string}</p>}
             </Form.Item>
             <Form.Item>
                 <label>Loại dịch vụ <span className='error'>*</span></label>
@@ -311,7 +319,6 @@ const Modal = (props: Props) => {
                     style={{ minWidth: '15rem', width: 'fit-content' }}
                     placeholder="Chọn loại dịch vụ"
                     options={(typeService.state.data as Array<Obj>)?.map((sv) => {
-                        console.log(sv);
                         return {
                             label: sv.tenloaidichvu,
                             value: sv.id_loaidichvu
@@ -328,7 +335,7 @@ const Modal = (props: Props) => {
                         setFieldValue('id_loaidichvu', value);
                     }}
                 />
-                {errors?.id_loaidichvu && <p className="error">{errors?.id_loaidichvu as string}</p>}
+                {errors?.id_loaidichvu && touched?.id_loaidichvu && <p className="error">{errors?.id_loaidichvu as string}</p>}
             </Form.Item>
             <Form.Item>
                 <label>
@@ -420,6 +427,24 @@ const Modal = (props: Props) => {
             }
         }
     }, [props.type, contractService.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.SERVICE) {
+            if (props.typeModal === 'CREATE') {
+                if (serviceStorage.state.componentId === componentId.current && serviceStorage.state.success) {
+                    serviceStorage.clear();
+                    toastify('Thêm dịch vụ thành công!', {
+                        type: 'success'
+                    });
+                    props.closeModal();
+                }
+                if (serviceStorage.state.error) {
+                    toastify(serviceStorage.state.error, {
+                        type: 'error'
+                    });
+                }
+            }
+        }
+    }, [props.type, serviceStorage.state, props.typeModal]);
     return (
         <ModalComponent
             {...props.modalProps}

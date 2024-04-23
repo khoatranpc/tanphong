@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
 import StorageComponent, { Storages } from './StorageComponent';
 
@@ -11,6 +12,7 @@ const Storage = () => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
     const [typeStorage, setTypeStorage] = useState<Storages | string>('');
+    const componentId = useRef(uuid());
 
     return (
         <StorageComponent
@@ -22,6 +24,7 @@ const Storage = () => {
             typePropertyStorage={typePropertyStorage}
             setTypeStorage={setTypeStorage}
             typeStorage={typeStorage}
+            componentId={componentId.current}
         />
     )
 }
