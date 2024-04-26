@@ -1,5 +1,5 @@
 "use client";
-import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker } from 'antd';
+import { ModalProps, Modal as ModalComponent, Form, Input, InputNumber, Table, Button, Select, DatePicker, Popconfirm } from 'antd';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { DefaultOptionType } from 'antd/es/select';
 import dayjs from 'dayjs';
@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { Obj } from '@/global';
 import { ResultHook, formatDateToString, toastify, uuid } from '@/utils';
-import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService } from '@/utils/hooks';
+import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService, useUpdateManyContractService } from '@/utils/hooks';
 import { getColumns, getDataDetail } from './config';
 import { Storages } from './StorageComponent';
 import styles from './Storage.module.scss';
@@ -83,11 +83,6 @@ const initvalues: Record<Storages, Obj> = {
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
 
-
-const disabledUpdate = (prevData: any, nextData: any) => {
-    return JSON.stringify(prevData) === JSON.stringify(nextData);
-}
-
 const getMethod = (typeModal: 'CREATE' | 'VIEW') => {
     return typeModal === 'VIEW' ? 'put' : 'post'
 }
@@ -103,6 +98,7 @@ const Modal = (props: Props) => {
     const typeService = useTypeService();
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
+    const updateManyContractService = useUpdateManyContractService();
 
     const dataState: Record<Storages, ResultHook> = {
         CONTRACT: contractStorage,
@@ -112,52 +108,53 @@ const Modal = (props: Props) => {
         PT: propertyStorage,
         T_PT: typePropertyStorage,
     }
-    const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
-    const recordData: Record<Storages, () => Obj> = {
-        CONTRACT: () => {
-            const crrContract = getDataDetail(props.id, contractStorage.state.data as Array<any>, props.type);
-            const crrContractServices = getDataDetail(props.id, contractService.state.data as Array<any>, props.type, true);
-            return {
-                ...crrContract,
-                contractServices: crrContractServices?.map((item: Obj, idx: number) => {
-                    return {
-                        key: idx,
-                        ...item,
-                        id_hopdong: { ...crrContract },
-                        id_dichvu: getDataDetail(item.id_dichvu, serviceStorage.state.data as Array<any>, Storages.SERVICE)
-
-                    }
-                })
-            }
-        },
-        SERVICE: () => {
-            const crrService = getDataDetail(props.id, serviceStorage.state.data as Array<any>, props.type);
-            return {
-                ...crrService,
-            }
-        },
-        T_SV: () => {
-            const crrTypeService = getDataDetail(props.id, typeService.state.data as Array<any>, props.type);
-            return {
-                ...crrTypeService
-            }
-        },
-        CT_SV: () => ({}),
-        PT: () => {
-            const crrPt = getDataDetail(props.id, propertyStorage.state.data as Array<any>, props.type);
-            const crrTypePt = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, Storages.T_PT);
-            return {
-                ...crrPt,
-                id_loaitaisan: crrTypePt.id_loaitaisan
-            }
-        },
-        T_PT: () => {
-            const crrTypePT = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, props.type);
-            return {
-                ...crrTypePT
-            }
-        },
-    };
+    const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading || updateManyContractService.state.isLoading;
+    const recordData: Record<Storages, () => Obj> = useMemo(() => {
+        return {
+            CONTRACT: () => {
+                const crrContract = getDataDetail(props.id, contractStorage.state.data as Array<any>, props.type);
+                const crrContractServices = getDataDetail(props.id, contractService.state.data as Array<any>, props.type, true);
+                return {
+                    ...crrContract,
+                    contractServices: crrContractServices?.map((item: Obj, idx: number) => {
+                        return {
+                            key: idx,
+                            ...item,
+                            id_hopdong: { ...crrContract },
+                            id_dichvu: getDataDetail(item.id_dichvu, serviceStorage.state.data as Array<any>, Storages.SERVICE)
+                        }
+                    })
+                }
+            },
+            SERVICE: () => {
+                const crrService = getDataDetail(props.id, serviceStorage.state.data as Array<any>, props.type);
+                return {
+                    ...crrService,
+                }
+            },
+            T_SV: () => {
+                const crrTypeService = getDataDetail(props.id, typeService.state.data as Array<any>, props.type);
+                return {
+                    ...crrTypeService
+                }
+            },
+            CT_SV: () => ({}),
+            PT: () => {
+                const crrPt = getDataDetail(props.id, propertyStorage.state.data as Array<any>, props.type);
+                const crrTypePt = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, Storages.T_PT);
+                return {
+                    ...crrPt,
+                    id_loaitaisan: crrTypePt.id_loaitaisan
+                }
+            },
+            T_PT: () => {
+                const crrTypePT = getDataDetail(props.id, typePropertyStorage.state.data as Array<any>, props.type);
+                return {
+                    ...crrTypePT
+                }
+            },
+        }
+    }, []);
     const handleToast = (state: ResultHook, messageSuccessToast: string) => {
         if (state.state.componentId === componentId.current && state.state.success) {
             state.clear();
@@ -173,15 +170,30 @@ const Modal = (props: Props) => {
             state.clear();
         }
     };
-    const dataPrev = useMemo(() => {
-        return props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type]
-    }, [props.typeModal]);
     const { values, errors, handleSubmit, handleChange, setFieldValue, touched, handleBlur, setValues, setTouched } = useFormik({
         initialValues: props.typeModal === 'VIEW' ? recordData[props.type]() : initvalues[props.type],
         validationSchema,
         onSubmit(values) {
+            const getValues = {
+                ...values
+            };
+            if (props.typeModal === 'VIEW') {
+                if (props.type === Storages.CONTRACT) {
+                    if ((getValues.contractService as Obj[])?.length !== 0) {
+                        updateManyContractService.put?.(componentId.current, {
+                            body: (getValues.contractServices as Obj[])?.map((item) => {
+                                return {
+                                    ...item,
+                                    id_dichvu: item.id_dichvu.id_dichvu,
+                                    id_hopdong: item.id_hopdong.id_hopdong
+                                }
+                            })
+                        });
+                    }
+                }
+            }
             dataState[props.type][getMethod(props.typeModal)]?.(componentId.current, {
-                body: values,
+                body: getValues,
                 ...props.typeModal === 'VIEW' ? {
                     params: [props.id as string]
                 } : {}
@@ -291,7 +303,20 @@ const Modal = (props: Props) => {
                             ...col,
                             render(value, record: Obj, idx) {
                                 return col.key === 'id_hopdong' ? value.sohd : (col.key === 'action' ? <div>
-                                    <Button size="small">Xoá</Button>
+                                    <Popconfirm
+                                        title="Xoá thông tin"
+                                        description="Bạn có chắc chắn muốn xoá thông tin?"
+                                        okText="Xoá"
+                                        cancelText="Huỷ"
+                                        okButtonProps={{
+                                            loading: false
+                                        }}
+                                        onConfirm={() => {
+                                            handleDeleteContractService(idx);
+                                        }}
+                                    >
+                                        <Button danger size="small">Xoá</Button>
+                                    </Popconfirm>
                                 </div> : (col.dataIndex === 'id_dichvu' ? <Select
                                     filterOption={filterOptionSelect}
                                     showSearch
@@ -525,6 +550,18 @@ const Modal = (props: Props) => {
             });
         }
     }
+    const handleDeleteContractService = (idx: number) => {
+        const contractServices = (values.contractServices as Obj[]);
+        const checktExistedDatabase = contractServices?.[idx] as Obj;
+        // delete from database
+        if (Number(checktExistedDatabase.key)) {
+            console.log('database')
+        } else {
+            // delete from new data
+            (values.contractServices as Obj[])?.splice(idx, 1);
+            setValues({ ...values });
+        }
+    }
     useEffect(() => {
         switch (props.type) {
             case Storages.CONTRACT:
@@ -543,6 +580,15 @@ const Modal = (props: Props) => {
                 }
         }
     }, [props.type, contractStorage.state, props.typeModal]);
+    useEffect(() => {
+        if (props.type === Storages.CONTRACT) {
+            if (props.typeModal === 'VIEW') {
+                if (updateManyContractService.state.success && (values.contractServices as Obj[])?.length !== 0) {
+                    handleToast(updateManyContractService, 'Cập nhật hợp đồng thành công!');
+                }
+            }
+        }
+    }, [updateManyContractService.state, values]);
     useEffect(() => {
         if (props.type === Storages.CONTRACT) {
             if (props.typeModal === 'CREATE') {
@@ -596,9 +642,6 @@ const Modal = (props: Props) => {
             }}
             okText="Lưu"
             confirmLoading={getLoading}
-            okButtonProps={{
-                disabled: disabledUpdate(dataPrev, values)
-            }}
         >
             <Form
             >

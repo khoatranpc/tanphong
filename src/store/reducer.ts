@@ -5,6 +5,7 @@ import contractServiceStorage from './reducers/storage/contractService.reducer';
 import typeServiceStorage from './reducers/storage/typeService.reducer';
 import propertyStorage from './reducers/storage/property.reducer';
 import typePropertyStorage from './reducers/storage/typeProperty.reducer';
+import updateManycontractServiceStorage from './reducers/storage/updateManyContractService.reducer';
 
 const rootReducer = {
     exampleReducer,
@@ -13,7 +14,8 @@ const rootReducer = {
     contractServiceStorage,
     typeServiceStorage,
     propertyStorage,
-    typePropertyStorage
+    typePropertyStorage,
+    updateManycontractServiceStorage
 }
 
 export default rootReducer;
