@@ -4,7 +4,7 @@ import { ColumnsType } from "antd/es/table";
 import { Obj } from "@/global";
 import { Storages, getIdData } from "./StorageComponent";
 
-const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): ColumnsType<AnyObject> => {
+const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: number) => React.ReactNode): ColumnsType<AnyObject> => {
     switch (typeStorage) {
         case Storages.CONTRACT:
             return [
@@ -60,8 +60,8 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                         key: 'action',
                         title: 'Hành động',
                         width: 50,
-                        render() {
-                            return actionCell
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
                         }
                     }
                 ] : []
@@ -91,7 +91,17 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                     key: 'chuthich',
                     dataIndex: 'chuthich',
                     title: 'Chú thích'
-                }
+                },
+                ...actionCell ? [
+                    {
+                        key: 'action',
+                        title: 'Hành động',
+                        width: 50,
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
+                        }
+                    }
+                ] : []
             ];
         case Storages.CT_SV:
             return [
@@ -166,8 +176,8 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                         key: 'action',
                         title: 'Hành động',
                         width: 50,
-                        render() {
-                            return actionCell
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
                         }
                     }
                 ] : []
@@ -197,8 +207,8 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                         key: 'action',
                         title: 'Hành động',
                         width: 50,
-                        render() {
-                            return actionCell
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
                         }
                     }
                 ] : []
@@ -251,8 +261,8 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                         key: 'action',
                         title: 'Hành động',
                         width: 50,
-                        render() {
-                            return actionCell
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
                         }
                     }
                 ] : []
@@ -281,8 +291,8 @@ const getColumns = (typeStorage: Storages, actionCell?: React.ReactNode): Column
                         key: 'action',
                         title: 'Hành động',
                         width: 50,
-                        render() {
-                            return actionCell
+                        render(_: any, record: any, index: number) {
+                            return actionCell?.(record, index)
                         }
                     }
                 ] : []

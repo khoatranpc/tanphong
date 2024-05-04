@@ -9,12 +9,20 @@ import { Query } from "./axios";
 import { format } from "date-fns";
 import { ToastContent, ToastOptions, toast } from "react-toastify";
 
-
 export interface RestQuery {
-    get?: (componentId?: string, query?: Query, isReload?: boolean) => void;
-    post?: (componentId?: string, query?: Query) => void;
-    put?: (componentId?: string, query?: Query) => void;
-    delete?: (componentId?: string, query?: Query) => void;
+    /**
+     * 
+     * @param componentId 
+     * @param query 
+     * @param isReload 
+     * @param callbackFnc - execute when action query success
+     * 
+     * @returns 
+     */
+    get?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
+    post?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
+    put?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
+    delete?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void) => void;
 }
 
 export interface ResultHook extends RestQuery {
@@ -47,8 +55,8 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
         const query: RestQuery = {};
         for (const key in queryThunk) {
             if (Object.prototype.hasOwnProperty.call(queryThunk, key)) {
-                query[key as keyof RestQuery] = (componentId?: string, query?: Query, isReload?: boolean) => {
-                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId, isReload }));
+                query[key as keyof RestQuery] = (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void) => {
+                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId, isReload, callbackFnc }));
                 }
             }
         }

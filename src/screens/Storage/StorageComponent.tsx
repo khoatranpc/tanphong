@@ -1,10 +1,10 @@
 "use client";
 import React, { memo, useEffect, useState } from 'react';
-import { Button, Input, Select, Table } from 'antd';
+import { Button, Input, Popconfirm, Select, Table } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { DefaultOptionType } from 'antd/es/select';
 import { Obj } from '@/global';
-import { ResultHook } from '@/utils';
+import { ResultHook, toastify } from '@/utils';
 import { getColumns, getNameState } from './config';
 import Modal from './Modal';
 import styles from './Storage.module.scss';
@@ -62,6 +62,14 @@ const StorageComponent = (props: StorageComponentProps) => {
     const propertyStorage = props.propertyStorage;
     const typePropertyStorage = props.typePropertyStorage;
     const [searchValue, setSeachValue] = useState<string>('');
+    const dataState: Record<Storages, ResultHook> = {
+        CONTRACT: contractStorage,
+        SERVICE: serviceStorage,
+        CT_SV: contractService,
+        T_SV: typeService,
+        PT: propertyStorage,
+        T_PT: typePropertyStorage,
+    }
     const [modal, setModal] = useState<{
         open: boolean;
         type: 'VIEW' | 'CREATE';
@@ -130,6 +138,7 @@ const StorageComponent = (props: StorageComponentProps) => {
         T_PT: (item: Obj) => String(item.tenloaitaisan).trim().toLowerCase().includes(searchValue.toLowerCase().trim()),
         T_SV: (item: Obj) => String(item.tenloaidichvu).trim().toLowerCase().includes(searchValue.toLowerCase().trim())
     }
+    const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
     const getDataSource = data[props.typeStorage as Storages]?.filter((item) => {
         return conditionFilter[props.typeStorage as Storages](item);
     }).map((item, idx) => {
@@ -138,6 +147,14 @@ const StorageComponent = (props: StorageComponentProps) => {
             key: idx
         }
     });
+    const handleDeleteRecord = (idx: number, record: Obj) => {
+        const id = record[getIdData[props.typeStorage as Storages]] as string;
+        dataState[props.typeStorage as Storages].delete?.(props.componentId, {
+            params: [id]
+        }, undefined, (isSuccess) => {
+            toastify(isSuccess ? 'Xoá thông tin thành công' : 'Có lỗi xảy ra!');
+        });
+    }
     const getDisabled = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || typePropertyStorage.state.isLoading || propertyStorage.state.isLoading || !props.typeStorage;
     const onChangeSearchSelect = (value: Storages) => {
         setSeachValue('');
@@ -158,15 +175,14 @@ const StorageComponent = (props: StorageComponentProps) => {
                     contractService.get?.(props.componentId, undefined, isReload);
                     serviceStorage.get?.(props.componentId, undefined, isReload);
                 } else {
-
                     if (!contractStorage.state.data) {
                         contractStorage.get?.(props.componentId, undefined, isReload);
                     }
                     if (!contractService.state.data) {
-                        contractService.get?.(props.componentId, undefined, isReload);
+                        contractService.get?.(props.componentId, undefined, isReload,);
                     }
                     if (!serviceStorage.state.data) {
-                        serviceStorage.get?.(props.componentId, undefined, isReload);
+                        serviceStorage.get?.(props.componentId, undefined, isReload,);
                     }
                 }
                 break;
@@ -271,15 +287,34 @@ const StorageComponent = (props: StorageComponentProps) => {
                     className={styles.table}
                     bordered
                     dataSource={getDataSource}
-                    loading={contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading}
-                    columns={getColumns(props.typeStorage as Storages)}
-                    onRow={(data) => {
-                        return {
-                            onClick() {
-                                handleModalData(data[getIdData[props.typeStorage as Storages]], 'VIEW');
-                            }
-                        }
-                    }}
+                    loading={getLoading}
+                    columns={getColumns(props.typeStorage as Storages, (record: any, idx) => {
+                        return <div className={styles.groupBtnAction}>
+                            <Button
+                                size="small"
+                                loading={getLoading}
+                                onClick={() => {
+                                    handleModalData(record[getIdData[props.typeStorage as Storages]], 'VIEW');
+                                }}
+                            >
+                                Chi tiết
+                            </Button>
+                            <Popconfirm
+                                title="Xoá thông tin"
+                                description="Bạn có chắc chắn muốn xoá thông tin?"
+                                okText="Xoá"
+                                cancelText="Huỷ"
+                                okButtonProps={{
+                                    loading: false
+                                }}
+                                onConfirm={() => {
+                                    handleDeleteRecord(idx as number, record);
+                                }}
+                            >
+                                <Button danger size="small">Xoá</Button>
+                            </Popconfirm>
+                        </div>;
+                    })}
                     rowClassName={styles.rowTable}
                 />
             </div>

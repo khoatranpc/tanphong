@@ -59,6 +59,8 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                     });
                     builder.addCase(request.fulfilled, (state, action) => {
                         const componentId = action.meta.arg.componentId;
+                        const callbackFnc: Function = action.meta.arg.callbackFnc as Function;
+                        callbackFnc?.(true);
                         (state as State).state = {
                             data: action.payload,
                             isLoading: false,
@@ -68,6 +70,8 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                     });
                     builder.addCase(request.rejected, (state, action) => {
                         const componentId = action.meta.arg.componentId;
+                        const callbackFnc: Function = action.meta.arg.callbackFnc as Function;
+                        callbackFnc?.(false);
                         (state as State).state = {
                             data: null,
                             isLoading: false,

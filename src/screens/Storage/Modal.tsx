@@ -179,7 +179,7 @@ const Modal = (props: Props) => {
             };
             if (props.typeModal === 'VIEW') {
                 if (props.type === Storages.CONTRACT) {
-                    if ((getValues.contractService as Obj[])?.length !== 0) {
+                    if ((getValues.contractServices as Obj[])?.length !== 0) {
                         updateManyContractService.put?.(componentId.current, {
                             body: (getValues.contractServices as Obj[])?.map((item) => {
                                 return {
@@ -294,7 +294,7 @@ const Modal = (props: Props) => {
                 <Table
                     className={styles.table}
                     bordered
-                    columns={(getColumns(Storages.CT_SV, <div>
+                    columns={(getColumns(Storages.CT_SV, () => <div>
                         <Button size="small">Xoá</Button>
                     </div>)).filter((col: Obj) => {
                         return col.dataIndex !== 'id_hopdongdichvu'
