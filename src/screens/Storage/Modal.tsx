@@ -206,7 +206,8 @@ const Modal = (props: Props) => {
             const newRecordCTSV = {
                 key: uuid(),
                 id_hopdong: {
-                    sohd: values.sohd
+                    sohd: values.sohd,
+                    id_hopdong: values.id_hopdong
                 },
                 dientich_soluong: 0,
                 dongia: 0,
