@@ -9,7 +9,7 @@ import { Obj } from '@/global';
 import { ResultHook, formatDateToString, toastify, uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService, useUpdateManyContractService } from '@/utils/hooks';
 import { getColumns, getDataDetail } from './config';
-import { Storages } from './StorageComponent';
+import { Storages, getIdData } from './StorageComponent';
 import styles from './Storage.module.scss';
 
 interface Props {
@@ -200,6 +200,7 @@ const Modal = (props: Props) => {
             });
         }
     });
+
     const handleCreateNewRowCTSV = () => {
         if (props.type == Storages.CONTRACT) {
             const newRecordCTSV = {
@@ -292,6 +293,7 @@ const Modal = (props: Props) => {
             </Form.Item>
             <div className={styles.tableModal}>
                 <Table
+                    loading={getLoading}
                     className={styles.table}
                     bordered
                     columns={(getColumns(Storages.CT_SV, () => <div>
@@ -309,13 +311,13 @@ const Modal = (props: Props) => {
                                         okText="Xoá"
                                         cancelText="Huỷ"
                                         okButtonProps={{
-                                            loading: false
+                                            loading: getLoading
                                         }}
                                         onConfirm={() => {
                                             handleDeleteContractService(idx);
                                         }}
                                     >
-                                        <Button danger size="small">Xoá</Button>
+                                        <Button danger size="small" loading={getLoading}>Xoá</Button>
                                     </Popconfirm>
                                 </div> : (col.dataIndex === 'id_dichvu' ? <Select
                                     filterOption={filterOptionSelect}
@@ -554,8 +556,13 @@ const Modal = (props: Props) => {
         const contractServices = (values.contractServices as Obj[]);
         const checktExistedDatabase = contractServices?.[idx] as Obj;
         // delete from database
-        if (Number(checktExistedDatabase.key)) {
-            console.log('database')
+        if (typeof (checktExistedDatabase.key) === 'number') {
+            const id = contractServices[idx][getIdData[props.type === Storages.CONTRACT ? Storages.CT_SV : props.type]];
+            dataState[props.type === Storages.CONTRACT ? Storages.CT_SV : props.type].delete?.(componentId.current, {
+                params: [id]
+            }, undefined, (isSuccess) => {
+                toastify(isSuccess ? 'Xoá thông tin thành công' : 'Có lỗi xảy ra!');
+            });
         } else {
             // delete from new data
             (values.contractServices as Obj[])?.splice(idx, 1);

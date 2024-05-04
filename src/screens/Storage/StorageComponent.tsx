@@ -62,6 +62,7 @@ const StorageComponent = (props: StorageComponentProps) => {
     const propertyStorage = props.propertyStorage;
     const typePropertyStorage = props.typePropertyStorage;
     const [searchValue, setSeachValue] = useState<string>('');
+    const [delSuccess, setDelSuccess] = useState(false);
     const dataState: Record<Storages, ResultHook> = {
         CONTRACT: contractStorage,
         SERVICE: serviceStorage,
@@ -97,8 +98,8 @@ const StorageComponent = (props: StorageComponentProps) => {
     const data: Record<Storages, Array<any>> = {
         CONTRACT: contractStorage.state.data as Array<any> ?? [],
         CT_SV: contractService.state.data ? (contractService.state.data as Array<any>)?.map(item => {
-            const crrContract = (contractStorage.state.data as Array<any>)?.find(contract => contract.id_hopdong === item.id_hopdong);
-            const crrService = (serviceStorage.state.data as Array<any>)?.find(service => service.id_dichvu === item.id_dichvu);
+            const crrContract = ((contractStorage.state.data as Array<any>) ? (contractStorage.state.data as Array<any>) : []).find(contract => contract.id_hopdong === item.id_hopdong);
+            const crrService = ((serviceStorage.state.data as Array<any>) ? (serviceStorage.state.data as Array<any>) : []).find(service => service.id_dichvu === item.id_dichvu);
             return {
                 ...item,
                 id_hopdong: crrContract,
@@ -106,14 +107,14 @@ const StorageComponent = (props: StorageComponentProps) => {
             }
         }) ?? [] : [],
         PT: propertyStorage.state.data ? (propertyStorage.state.data as Array<any>)?.map((item) => {
-            const typeProperty = (typePropertyStorage.state.data as Array<any>)?.find((typeProperty) => typeProperty.id_loaitaisan === item.id_loaitaisan)
+            const typeProperty = ((typePropertyStorage.state.data as Array<any>) ? (typePropertyStorage.state.data as Array<any>) : []).find((typeProperty) => typeProperty.id_loaitaisan === item.id_loaitaisan)
             return {
                 ...item,
                 typeProperty
             }
         }) ?? [] : [],
         SERVICE: serviceStorage.state.data ? (serviceStorage.state.data as Array<any>)?.map((item) => {
-            const crrTypeService = (typeService.state.data as Array<any>)?.find(typeService => typeService.id_loaidichvu === item.id_loaidichvu)
+            const crrTypeService = ((typeService.state.data as Array<any>) ? (typeService.state.data as Array<any>) : []).find(typeService => typeService.id_loaidichvu === item.id_loaidichvu)
             return {
                 ...item,
                 loaidichvu: crrTypeService
@@ -139,7 +140,7 @@ const StorageComponent = (props: StorageComponentProps) => {
         T_SV: (item: Obj) => String(item.tenloaidichvu).trim().toLowerCase().includes(searchValue.toLowerCase().trim())
     }
     const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
-    const getDataSource = data[props.typeStorage as Storages]?.filter((item) => {
+    const getDataSource = (data[props.typeStorage as Storages] ? data[props.typeStorage as Storages] : [])?.filter((item) => {
         return conditionFilter[props.typeStorage as Storages](item);
     }).map((item, idx) => {
         return {
@@ -147,14 +148,6 @@ const StorageComponent = (props: StorageComponentProps) => {
             key: idx
         }
     });
-    const handleDeleteRecord = (idx: number, record: Obj) => {
-        const id = record[getIdData[props.typeStorage as Storages]] as string;
-        dataState[props.typeStorage as Storages].delete?.(props.componentId, {
-            params: [id]
-        }, undefined, (isSuccess) => {
-            toastify(isSuccess ? 'Xoá thông tin thành công' : 'Có lỗi xảy ra!');
-        });
-    }
     const getDisabled = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || typePropertyStorage.state.isLoading || propertyStorage.state.isLoading || !props.typeStorage;
     const onChangeSearchSelect = (value: Storages) => {
         setSeachValue('');
@@ -232,9 +225,24 @@ const StorageComponent = (props: StorageComponentProps) => {
                 break;
         }
     }
+    const handleDeleteRecord = (idx: number, record: Obj) => {
+        const id = record[getIdData[props.typeStorage as Storages]] as string;
+        dataState[props.typeStorage as Storages].delete?.(props.componentId, {
+            params: [id]
+        }, undefined, (isSuccess) => {
+            toastify(isSuccess ? 'Xoá thông tin thành công' : 'Có lỗi xảy ra!');
+            if (isSuccess) setDelSuccess(true);
+        });
+    }
     useEffect(() => {
         handleQueryData();
     }, [props.typeStorage]);
+    useEffect(() => {
+        if (delSuccess) {
+            handleQueryData(true);
+            setDelSuccess(false);
+        }
+    }, [delSuccess]);
     useEffect(() => {
         switch (props.typeStorage) {
             case Storages.CONTRACT:

@@ -62,7 +62,7 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
                         const callbackFnc: Function = action.meta.arg.callbackFnc as Function;
                         callbackFnc?.(true);
                         (state as State).state = {
-                            data: action.payload,
+                            data: action.payload ?? {},
                             isLoading: false,
                             success: true,
                             componentId
