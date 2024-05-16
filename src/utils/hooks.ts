@@ -7,6 +7,7 @@ import { clearTypeServiceStorage, queryDeleteTypeServiceStorage, queryGetTypeSer
 import { clearPropertyStorage, queryDeletePropertyStorage, queryGetPropertyStorage, queryPostPropertyStorage, queryPutPropertyStorage } from "@/store/reducers/storage/property.reducer";
 import { clearTypeProperty, queryDeleteTypePropertyStorage, queryGetTypePropertyStorage, queryPostTypePropertyStorage, queryPutTypePropertyStorage } from "@/store/reducers/storage/typeProperty.reducer";
 import { clearUpdateManyContractService, queryUpdateManyContractService } from "@/store/reducers/storage/updateManyContractService.reducer";
+import { clearPaymentContract, queryCreatePaymentContract, queryGetPaymentContract } from "@/store/reducers/storage/paymentContract.reducer";
 
 const useExample = createHookReducer('exampleReducer', {
     get: QueryGetExample
@@ -55,7 +56,12 @@ const useTypeProperty = createHookReducer('typePropertyStorage', {
 
 const useUpdateManyContractService = createHookReducer('updateManycontractServiceStorage', {
     put: queryUpdateManyContractService,
-}, clearUpdateManyContractService)
+}, clearUpdateManyContractService);
+
+const usePaymentContract = createHookReducer('paymentContract', {
+    post: queryCreatePaymentContract,
+    get: queryGetPaymentContract
+}, clearPaymentContract);
 export {
     useExample,
     useContract,
@@ -64,5 +70,6 @@ export {
     useTypeService,
     useProperty,
     useTypeProperty,
-    useUpdateManyContractService
+    useUpdateManyContractService,
+    usePaymentContract
 }

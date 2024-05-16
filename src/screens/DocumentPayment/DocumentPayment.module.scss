@@ -1,0 +1,124 @@
+.documentPayment {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    gap: 1.2rem;
+    flex: 1;
+
+    .list {
+        padding: 0 1.6rem;
+        height: 100%;
+
+        h2 {
+            margin-bottom: 1.6rem;
+        }
+
+        .item {
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 0.8rem;
+            border: 1px solid black;
+            border-radius: 0.8rem;
+            transition: 0.3s;
+
+            &:hover,
+            &.active {
+                border-color: #2f6dfd;
+                color: #ffffff;
+                background-color: #2f5ffd7b;
+            }
+        }
+    }
+
+    .tabSide {
+        min-width: 20rem;
+        padding: 0 1.6rem;
+        border-bottom: 1px solid black;
+        display: flex;
+        gap: 1.8rem;
+        padding-bottom: 1.8rem;
+
+        span {
+            display: inline-block;
+            width: fit-content;
+            font-size: 1.8rem;
+            font-weight: 500;
+            padding: 0.8rem 1.2rem;
+            border-radius: 0.8rem;
+            border: 1px solid #808080;
+            cursor: pointer;
+            transition: 0.2s;
+
+            &.active,
+            &:hover {
+                border-color: #2f6dfd;
+                color: #ffffff;
+                background-color: #2f5ffd7b;
+            }
+        }
+    }
+
+    .contentDocument {
+        flex: 1;
+        margin: auto;
+        border-left: 1px solid black;
+        padding: 0.8rem;
+    }
+}
+
+
+.documentPayment {
+    padding-top: 1.8rem;
+
+    .document {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+
+        .headerNotiDoc {
+            justify-content: space-between;
+
+            h3,
+            .slogan {
+                text-align: center;
+            }
+
+            b {
+                text-decoration: underline;
+            }
+        }
+
+        .flex {
+            display: flex !important;
+        }
+
+        .directionColumn {
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .no {
+            align-items: flex-end;
+        }
+
+        .content {
+            margin-top: 1.6rem;
+
+            h3 {
+                text-align: center;
+            }
+        }
+
+        .tableView {
+            * {
+                background-color: transparent !important;
+                border-color: black !important;
+                border-radius: 0 !important;
+            }
+
+            th {
+                font-weight: bold !important;
+            }
+        }
+    }
+}

@@ -1,6 +1,7 @@
 "use client";
 import React, { memo, useEffect, useState } from 'react';
 import { Button, Input, Popconfirm, Select, Table } from 'antd';
+import { useRouter } from 'next/navigation';
 import { ReloadOutlined } from '@ant-design/icons';
 import { DefaultOptionType } from 'antd/es/select';
 import { Obj } from '@/global';
@@ -63,6 +64,7 @@ const StorageComponent = (props: StorageComponentProps) => {
     const typePropertyStorage = props.typePropertyStorage;
     const [searchValue, setSeachValue] = useState<string>('');
     const [delSuccess, setDelSuccess] = useState(false);
+    const router = useRouter();
     const dataState: Record<Storages, ResultHook> = {
         CONTRACT: contractStorage,
         SERVICE: serviceStorage,
@@ -307,6 +309,13 @@ const StorageComponent = (props: StorageComponentProps) => {
                             >
                                 Chi tiết
                             </Button>
+                            {props.typeStorage === Storages.CONTRACT && <Button size="small" onClick={() => {
+                                const contractId = record.id_hopdong;
+                                router.push(`/storage/contract/${contractId}/document-payment`);
+                            }}
+                            >
+                                VBTT
+                            </Button>}
                             <Popconfirm
                                 title="Xoá thông tin"
                                 description="Bạn có chắc chắn muốn xoá thông tin?"
@@ -362,7 +371,7 @@ export default memo(StorageComponent, (prevProps: StorageComponentProps, nextPro
     }
 
     const getState = getNameState[getNextTypeStorage as any] as keyof StorageComponentProps;
-    if (!(prevProps[getState] as ResultHook).state.componentId) {
+    if (!(prevProps[getState] as ResultHook)?.state?.componentId) {
         return false;
     } else if ((prevProps[getState] as ResultHook).state.componentId && (prevProps.componentId === (nextProps[getState] as ResultHook).state.componentId)) {
         return false;

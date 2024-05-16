@@ -8,7 +8,10 @@ export default async function actionRequest(uri: string, method: Method, { paylo
         let parseUri = uri;
         const listReqParams = payload?.params;
         if (listReqParams && !parseUri.includes('$params')) {
-            throw new Error('Missing $params item');
+            // throw new Error('Missing $params item');
+            payload?.params?.forEach(param => {
+                parseUri += `/${param}`;
+            });
         }
         else if (listReqParams && parseUri.includes('$params')) {
             listReqParams.forEach((_, idx) => {
@@ -17,7 +20,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
         }
         switch (method) {
             case "GET":
-                response = httpClient.get(parseUri as string, { params: payload?.params }).then(
+                response = httpClient.get(parseUri as string, { params: payload?.queryParams }).then(
                     (response) => {
                         return response;
                     },
@@ -37,7 +40,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                 );
                 break;
             case "PUT":
-                response = httpClient.put(parseUri as string, payload?.body, { params: payload?.params, ...payload?.headers ? { headers: payload?.headers } : {} }).then(
+                response = httpClient.put(parseUri as string, payload?.body, { params: payload?.queryParams, ...payload?.headers ? { headers: payload?.headers } : {} }).then(
                     (response) => {
                         return response;
                     },

@@ -220,6 +220,26 @@ const Modal = (props: Props) => {
     const formData: Record<Storages, React.ReactNode> = {
         CONTRACT: props.type === Storages.CONTRACT ? <>
             <Form.Item>
+                <label>Ngày bắt đầu hợp đồng</label>
+                <br />
+                <DatePicker
+                    name='ngayghi'
+                    size="small"
+                    format={'DD/MM/YYYY'}
+                    onBlur={() => {
+                        setTouched({
+                            ...touched,
+                            ngayghi: true
+                        });
+                    }}
+                    value={dayjs(values.ngayghi)}
+                    onChange={(day) => {
+                        const getDay = day ? day.toDate() : new Date();
+                        setFieldValue('ngayghi', formatDateToString(getDay));
+                    }}
+                />
+            </Form.Item>
+            <Form.Item>
                 <label>Tên khách <span className='error'>*</span></label>
                 <Input size="small" name='ten' value={values.ten} onChange={handleChange} onBlur={handleBlur} />
                 {errors?.ten && touched?.ten && <p className="error">{errors?.ten as string}</p>}
@@ -305,7 +325,7 @@ const Modal = (props: Props) => {
                         return {
                             ...col,
                             render(value, record: Obj, idx) {
-                                return col.key === 'id_hopdong' ? value.sohd : (col.key === 'action' ? <div>
+                                return col.key === 'id_hopdong' ? value?.sohd : (col.key === 'action' ? <div>
                                     <Popconfirm
                                         title="Xoá thông tin"
                                         description="Bạn có chắc chắn muốn xoá thông tin?"
@@ -334,9 +354,8 @@ const Modal = (props: Props) => {
                                     value={value?.id_dichvu}
                                     onChange={(value) => {
                                         const crrService = getDataDetail(value, serviceStorage.state.data, Storages.SERVICE);
-                                        record.id_dichvu = {
-                                            ...crrService
-                                        };
+                                        (values.contractServices as Obj[])[idx].id_dichvu = crrService;
+                                        console.log((values.contractServices as Obj[])[idx]);
                                         setValues({ ...values });
                                     }}
                                 /> : (col.key !== 'chuthich' ? <InputNumber<number>
