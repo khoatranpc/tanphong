@@ -1,11 +1,11 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Obj } from '@/global';
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
 import NotiContract from './CreateNotiContract';
 import PayRequest from './PayRequest';
-import { usePaymentContract } from '@/utils/hooks';
+import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import styles from './DocumentPayment.module.scss';
 
@@ -31,11 +31,17 @@ const DocumentPayment = () => {
     const selectGroup = groupPaymentByNo(crrDataPayment);
     const [noNotiContract, setNoNoticontract] = useState("");
     const [isCreate, setIsCreate] = useState(false);
+    const contract = useContract();
+    const cT = useContractService();
+    const service = useService();
+
 
     const contentDoc: Record<Document, React.ReactNode> = {
         NOTI_CONTRACT: <NotiContract noNoti={noNotiContract} isCreate={isCreate} />,
         PAY_REQUEST: <PayRequest />
     }
+    const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
+
     return (
         <div className={styles.documentPayment}>
             <div className={styles.list}>
@@ -51,7 +57,7 @@ const DocumentPayment = () => {
                 </Button>
                 </h2>
                 {
-                    !!Object.keys(selectGroup).length ? Object.keys(selectGroup).map((item, idx) => {
+                    getLoading ? <p>Đang tải...</p> : (!!Object.keys(selectGroup).length ? Object.keys(selectGroup).map((item, idx) => {
                         return <p
                             key={idx}
                             className={`${styles.item} ${item.split("$")[0] === noNotiContract ? styles.active : ''}`}
@@ -64,7 +70,8 @@ const DocumentPayment = () => {
                                 item.split("$")[0]
                             }
                         </p>
-                    }) : <p>Chưa có thông tin văn bản thông báo</p>
+                    }) :
+                        <p>Chưa có thông tin văn bản thông báo</p>)
                 }
             </div>
             <div className={styles.contentDocument}>

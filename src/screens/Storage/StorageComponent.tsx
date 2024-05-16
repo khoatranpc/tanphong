@@ -100,7 +100,7 @@ const StorageComponent = (props: StorageComponentProps) => {
     const data: Record<Storages, Array<any>> = {
         CONTRACT: contractStorage.state.data as Array<any> ?? [],
         CT_SV: contractService.state.data ? (contractService.state.data as Array<any>)?.map(item => {
-            const crrContract = ((contractStorage.state.data as Array<any>) ? (contractStorage.state.data as Array<any>) : []).find(contract => contract.id_hopdong === item.id_hopdong);
+            const crrContract = ((contractStorage.state.data as Array<any>) && Array.isArray((contractStorage.state.data as Array<any>)) ? (contractStorage.state.data as Array<any>) : [])?.find(contract => contract.id_hopdong === item.id_hopdong);
             const crrService = ((serviceStorage.state.data as Array<any>) ? (serviceStorage.state.data as Array<any>) : []).find(service => service.id_dichvu === item.id_dichvu);
             return {
                 ...item,
