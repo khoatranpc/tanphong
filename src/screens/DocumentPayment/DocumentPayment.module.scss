@@ -243,3 +243,13 @@
         }
     }
 }
+
+.boundary {
+    width: 100%;
+    position: relative;
+
+    .switch {
+        position: absolute;
+        top: -1.8rem
+    }
+}

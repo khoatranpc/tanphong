@@ -1,22 +1,25 @@
 "use client";
-import React from 'react';
+import React, { forwardRef, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Table } from 'antd';
+import { Switch, Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Obj } from '@/global';
+import { uuid } from '@/utils';
 import { useContract, usePaymentContract, useService } from '@/utils/hooks';
 import styles from './DocumentPayment.module.scss';
-import { uuid } from '@/utils';
+import CreateNotiContract from './CreateNotiContract';
 
 interface Props {
     noNoti: string;
+    ref: React.RefObject<any>;
 }
-const DocumentNoticontract = (props: Props) => {
+const DocumentNoticontract = (props: Props, ref: any) => {
     const contract = useContract();
     const params = useParams();
     const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params?.contractId)) : contract.state.data as Obj;
     const paymentContract = usePaymentContract();
     const service = useService();
+    const [update, setUpdate] = useState(false);
     const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
         return {
             ...item,
@@ -27,7 +30,13 @@ const DocumentNoticontract = (props: Props) => {
     const lastRow = [
         {
             stt: 'Tổng tiền trước thuế',
-            tientruocthue: 10000,
+            tientruocthue: crrDataPayment?.reduce((prevValue, crrItem) => {
+                return {
+                    tientruocthue: prevValue.tientruocthue + crrItem.tientruocthue
+                }
+            }, {
+                tientruocthue: 0
+            }).tientruocthue,
             colSpan: 8,
             coldichvu: 0,
             coldonvitinh: 0,
@@ -41,7 +50,13 @@ const DocumentNoticontract = (props: Props) => {
         },
         {
             stt: 'Tổng tiền sau thuế',
-            tientruocthue: 20000000,
+            tientruocthue: crrDataPayment?.reduce((prevValue, crrItem) => {
+                return {
+                    tiensauthue: prevValue.tiensauthue + crrItem.tiensauthue
+                }
+            }, {
+                tiensauthue: 0
+            }).tiensauthue,
             colSpan: 8,
             coldichvu: 0,
             coldonvitinh: 0,
@@ -182,41 +197,43 @@ const DocumentNoticontract = (props: Props) => {
     return (
         <div className={styles.documentPayment}>
             {!props.noNoti ? <p>Lựa chọn danh sách mã đề nghị để xem văn bản hoặc tạo thông tin văn bản mới!</p> :
-                <div className={styles.document}>
-                    <div className={`${styles.headerNotiDoc} ${styles.flex}`}>
-                        <div className={`${styles.flex} ${styles.directionColumn}`}>
-                            <h3 style={{ textDecoration: 'underline' }}>CÔNG TY CỔ PHẦN TÂN PHONG</h3>
-                            <p>Số: {props.noNoti}</p>
-                        </div>
-                        <div>
-                            <div className={`${styles.flex} ${styles.directionColumn} ${styles.slogan}`} style={{ marginBottom: '0.8rem' }}>
-                                <h3>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</h3>
-                                <h3><b>Độc Lập - Tự Do - Hạnh Phúc</b></h3>
+                <div className={styles.boundary}>
+                    <div className={styles.document} ref={ref}>
+                        <div className={`${styles.headerNotiDoc} ${styles.flex}`}>
+                            <div className={`${styles.flex} ${styles.directionColumn}`}>
+                                <h3 style={{ textDecoration: 'underline' }}>CÔNG TY CỔ PHẦN TÂN PHONG</h3>
+                                <p>Số: {props.noNoti}</p>
                             </div>
-                            <p style={{ fontSize: '1.6rem', textAlign: 'right' }} >Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</p>
-                        </div>
-                    </div>
-                    <div className={styles.content}>
-                        <h3>THÔNG BÁO PHÍ DỊCH VỤ<br />(Tính đến tháng {new Date().getMonth()} năm {new Date().getFullYear()})</h3>
-                        <p>Kính gửi: {crrContract?.ten}</p>
-                        <p>Công ty Cổ Phần Tân Phong хin gửi đến Quý Công ty lời lời cảm ơn chân thành ᴠì ѕự quan tâm, ủng hộ ᴠà tin tưởng sử dụng dịch vụ của chúng tôi trong ѕuốt thời gian qua.</p>
-                        <p style={{ marginBottom: '1.2rem' }}>Bằng Văn bản nàу, chúng tôi хin thông báo phí sử dụng dịch vụ với các nội dung ѕau:</p>
-                        <div className={styles.table}>
-                            <Table
-                                columns={columns}
-                                className={styles.tableView}
-                                bordered
-                                dataSource={crrDataPayment}
-                                pagination={false}
-                            />
-                        </div>
-                        <p style={{ marginTop: '1.2rem' }}>Xin chân trọng cám ơn!</p>
-                        <div className={styles.end}>
-                            <div className={styles.from}>
-                                Nơi gửi:
+                            <div>
+                                <div className={`${styles.flex} ${styles.directionColumn} ${styles.slogan}`} style={{ marginBottom: '0.8rem' }}>
+                                    <h3>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</h3>
+                                    <h3><b>Độc Lập - Tự Do - Hạnh Phúc</b></h3>
+                                </div>
+                                <p style={{ fontSize: '1.6rem', textAlign: 'right' }} >Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</p>
                             </div>
-                            <div className={styles.signCompany}>
-                                CÔNG TY CỔ PHẦN TÂN PHONG
+                        </div>
+                        <div className={styles.content}>
+                            <h3>THÔNG BÁO PHÍ DỊCH VỤ<br />(Tính đến tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()})</h3>
+                            <p>Kính gửi: {crrContract?.ten}</p>
+                            <p>Công ty Cổ Phần Tân Phong хin gửi đến Quý Công ty lời lời cảm ơn chân thành ᴠì ѕự quan tâm, ủng hộ ᴠà tin tưởng sử dụng dịch vụ của chúng tôi trong ѕuốt thời gian qua.</p>
+                            <p style={{ marginBottom: '1.2rem' }}>Bằng Văn bản nàу, chúng tôi хin thông báo phí sử dụng dịch vụ với các nội dung ѕau:</p>
+                            <div className={styles.table}>
+                                <Table
+                                    columns={columns}
+                                    className={styles.tableView}
+                                    bordered
+                                    dataSource={crrDataPayment}
+                                    pagination={false}
+                                />
+                            </div>
+                            <p style={{ marginTop: '1.2rem' }}>Xin chân trọng cám ơn!</p>
+                            <div className={styles.end}>
+                                <div className={styles.from}>
+                                    Nơi gửi:
+                                </div>
+                                <div className={styles.signCompany}>
+                                    CÔNG TY CỔ PHẦN TÂN PHONG
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -226,4 +243,4 @@ const DocumentNoticontract = (props: Props) => {
     )
 }
 
-export default DocumentNoticontract;
+export default forwardRef(DocumentNoticontract);

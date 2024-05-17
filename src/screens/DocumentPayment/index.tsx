@@ -1,14 +1,17 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Obj } from '@/global';
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
+import { PrinterOutlined } from '@ant-design/icons';
+import { useReactToPrint } from 'react-to-print';
 import NotiContract from './CreateNotiContract';
 import PayRequest from './PayRequest';
+import { uuid } from '@/utils';
 import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import styles from './DocumentPayment.module.scss';
-import { PrinterOutlined } from '@ant-design/icons';
+import CreateNotiContract from './CreateNotiContract';
 
 export interface TypeDocument {
     NOTI_CONTRACT: string;
@@ -34,16 +37,29 @@ const DocumentPayment = () => {
     const [noPayrequest, setPayrequest] = useState("");
     const [isCreate, setIsCreate] = useState(false);
     const contract = useContract();
+    const componentId = useRef(uuid());
     const cT = useContractService();
     const service = useService();
+    const docRef = useRef(null);
+    const handlePrint = useReactToPrint({
+        content: () => docRef.current,
+        bodyClass: 'printPageBill'
+    });
 
 
     const contentDoc: Record<Document, React.ReactNode> = {
-        NOTI_CONTRACT: <NotiContract noNoti={noNotiContract} isCreate={isCreate} />,
-        PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} />
+        NOTI_CONTRACT: isCreate ? <CreateNotiContract ref={docRef} noNoti={noNotiContract} isCreate={isCreate} /> : <NotiContract noNoti={noNotiContract} ref={docRef} isCreate={isCreate} />,
+        PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} ref={docRef} />
     }
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
-
+    useEffect(() => {
+        contract.get?.(componentId.current, {
+            params: [String(params?.contractId)],
+        });
+        paymentContract.get?.(componentId.current);
+        cT.get?.(componentId.current);
+        service.get?.(componentId.current);
+    }, []);
     return (
         <div className={styles.documentPayment}>
             <div className={styles.list}>
@@ -90,7 +106,7 @@ const DocumentPayment = () => {
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
-                    <PrinterOutlined style={{ marginLeft: 'auto' }} />
+                    {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} />}
                 </div>
                 {contentDoc[crrDoc]}
             </div>

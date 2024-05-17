@@ -1,9 +1,9 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import { ColumnsType } from 'antd/es/table';
 import { DefaultOptionType } from 'antd/es/select';
 import { useParams } from 'next/navigation';
-import { Button, Input, InputNumber, Select, Table } from 'antd';
+import { Button, Input, InputNumber, Select, Switch, Table } from 'antd';
 import { useFormik } from 'formik';
 import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { Obj } from '@/global';
@@ -14,21 +14,27 @@ import styles from './DocumentPayment.module.scss';
 interface Props {
     noNoti: string;
     isCreate?: boolean;
+    isUpdate?: boolean;
+    ref: React.RefObject<any>;
 }
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
-const NotiContract = (props: Props) => {
+const NotiContract = (props: Props, ref: any) => {
     const contract = useContract();
     const params = useParams();
     const cT = useContractService();
-    const paymentContract = usePaymentContract();
-    const crrCT = (paymentContract.state.data as Obj[])?.filter((item) => {
-        return String(item.id_hopdong) === String(params.contractId)
-    }) ?? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId));
-
     const service = useService();
+    const paymentContract = usePaymentContract();
+    const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId)) : ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+        return {
+            ...item,
+            dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
+            key: uuid()
+        }
+    }) as Obj[];
     const componentId = useRef(uuid());
-    const [signCompany, setSignCompany] = useState('');
+    const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
+    const [isViewDoc, setIsViewDoc] = useState(false);
 
     const isCreated = useRef(false);
     const { values, setValues } = useFormik({
@@ -48,7 +54,7 @@ const NotiContract = (props: Props) => {
             key: 'STT',
             title: 'STT',
             render(_, __, index) {
-                return index
+                return index + 1;
             },
             className: 'text-center'
         },
@@ -197,14 +203,9 @@ const NotiContract = (props: Props) => {
             title: 'Hành động',
             render(_, __, index) {
                 return <Button
-                    disabled={!!crrCT?.[index]}
                     size="small"
                     danger
                     onClick={() => {
-                        if (!crrCT?.[index]) {
-                            values.splice(index, 1);
-                            setValues([...values]);
-                        }
                     }}
                 >
                     Xoá
@@ -236,7 +237,7 @@ const NotiContract = (props: Props) => {
                         id_hopdong: params.contractId
                     }
                 });
-                paymentContract.put?.(componentId.current, {
+                (paymentContract[props.isCreate ? 'post' : 'put'])?.(componentId.current, {
                     body: data
                 });
             }
@@ -259,42 +260,25 @@ const NotiContract = (props: Props) => {
         }
     }, [paymentContract.state.data]);
     useEffect(() => {
-        if (!contract.state.isLoading) {
-            contract.get?.(componentId.current, {
-                params: [String(params?.contractId)],
-            });
-        }
-        if (!paymentContract.state.isLoading) {
-            paymentContract.get?.(componentId.current);
-        }
-        if (!cT.state.data) {
-            cT.get?.(componentId.current);
-        }
-        if (!service.state.data) {
-            service.get?.(componentId.current);
-        }
-        return () => {
-            contract.get?.();
-        }
-    }, []);
+        setSignCompany(!props.isCreate ? props.noNoti.split("ĐNTT-DV/")[1] : '');
+    }, [props.noNoti, props.isCreate]);
     useEffect(() => {
-        if (cT.state.data) {
-            setValues(crrCT?.map((item) => {
-                return {
-                    dichvu: item?.id_dichvu,
-                    key: uuid(),
-                    sosudung: 1,
-                    ...item,
-                }
-            }));
+        if (crrCT) {
+            setValues([...crrCT as any]);
         }
-    }, [cT.state.data]);
+    }, [props.isUpdate, props.isCreate, props.noNoti, cT.state.data, paymentContract.state.data]);
     return (
-        <div className={styles.notiContract}>
+        <div className={styles.notiContract} >
+            {!props.isCreate && <Switch checkedChildren="Chỉnh sửa" unCheckedChildren="Văn bản" className={styles.switch} defaultChecked={!isViewDoc} onChange={(checked) => setIsViewDoc(!checked)} />}
             {
-                props.isCreate ? (getLoading ? <div>Đang tải...</div> :
+                isViewDoc ?
+                    <DocumentNoticontract noNoti={props.noNoti} ref={props.ref} /> :
                     <div className={styles.content}>
-                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <input style={{ marginLeft: '0.8rem', outline: 'none' }} value={signCompany} onChange={(e) => setSignCompany(e.target.value)} /></div>
+                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <input style={{ marginLeft: '0.8rem', outline: 'none' }} value={signCompany} onChange={(e) => {
+                            if (!props.isUpdate) {
+                                setSignCompany(e.target.value);
+                            }
+                        }} /></div>
                         <div className={styles.table}>
                             <div style={{ textAlign: 'right', marginBottom: '1.2rem' }}>
                                 <Button
@@ -315,6 +299,7 @@ const NotiContract = (props: Props) => {
                                 columns={columns}
                                 dataSource={values}
                                 pagination={false}
+                                loading={getLoading}
                             />
                             <div style={{ textAlign: 'right', marginTop: '1.2rem' }}>
                                 <Button size="small" onClick={() => {
@@ -326,11 +311,11 @@ const NotiContract = (props: Props) => {
                                 </Button>
                             </div>
                         </div>
-                    </div>) : (<DocumentNoticontract noNoti={props.noNoti} />)
+                    </div>
             }
 
         </div>
     )
 }
 
-export default NotiContract;
+export default forwardRef(NotiContract);

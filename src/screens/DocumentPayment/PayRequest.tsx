@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { forwardRef } from 'react';
 import Image from 'next/image';
 import { Table } from 'antd';
 import { useParams } from 'next/navigation';
@@ -13,8 +13,9 @@ import styles from './DocumentPayment.module.scss';
 interface Props {
     noNoti: string;
     noPayrequest: string;
+    ref: React.RefObject<any>;
 }
-const PayRequest = (props: Props) => {
+const PayRequest = (props: Props, ref: any) => {
     const paymentContract = usePaymentContract();
     const params = useParams();
     const contract = useContract();
@@ -175,7 +176,7 @@ const PayRequest = (props: Props) => {
         },
     ];
     return (
-        <div className={styles.payRequest}>
+        <div className={styles.payRequest} ref={ref}>
             <div className={styles.logo}>
                 <Image alt='' src={logo} />
                 <div className={styles.companyInfo}>
@@ -199,7 +200,7 @@ const PayRequest = (props: Props) => {
             </p>
             <div className={styles.contentDocPayment}>
                 <p className={`text-center`}>
-                    <u><i>Kính gửi</i></u>: <b>Công ty TNHH Yongjuncheng</b>
+                    <u><i>Kính gửi</i></u>: <b>{crrContract?.ten}</b>
                 </p>
                 <ul>
                     <li>Căn cứ hợp đồng số: {crrContract && <>{crrContract?.sohd} Ngày {new Date(crrContract?.ngayghi).getDate()} tháng {new Date(crrContract?.ngayghi).getMonth() + 1} năm {new Date(crrContract?.ngayghi).getFullYear()}</>};</li>
@@ -236,4 +237,4 @@ const PayRequest = (props: Props) => {
     )
 }
 
-export default PayRequest;
+export default forwardRef(PayRequest);
