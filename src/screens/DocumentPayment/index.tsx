@@ -8,6 +8,7 @@ import PayRequest from './PayRequest';
 import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import styles from './DocumentPayment.module.scss';
+import { PrinterOutlined } from '@ant-design/icons';
 
 export interface TypeDocument {
     NOTI_CONTRACT: string;
@@ -30,6 +31,7 @@ const DocumentPayment = () => {
     const crrDataPayment = (paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId)) ?? [];
     const selectGroup = groupPaymentByNo(crrDataPayment);
     const [noNotiContract, setNoNoticontract] = useState("");
+    const [noPayrequest, setPayrequest] = useState("");
     const [isCreate, setIsCreate] = useState(false);
     const contract = useContract();
     const cT = useContractService();
@@ -38,7 +40,7 @@ const DocumentPayment = () => {
 
     const contentDoc: Record<Document, React.ReactNode> = {
         NOTI_CONTRACT: <NotiContract noNoti={noNotiContract} isCreate={isCreate} />,
-        PAY_REQUEST: <PayRequest />
+        PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} />
     }
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
 
@@ -63,6 +65,7 @@ const DocumentPayment = () => {
                             className={`${styles.item} ${item.split("$")[0] === noNotiContract ? styles.active : ''}`}
                             onClick={() => {
                                 setNoNoticontract(item.split("$")[0]);
+                                setPayrequest(item.split("$")[1]);
                                 setIsCreate(false);
                             }}
                         >
@@ -87,6 +90,7 @@ const DocumentPayment = () => {
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
+                    <PrinterOutlined style={{ marginLeft: 'auto' }} />
                 </div>
                 {contentDoc[crrDoc]}
             </div>

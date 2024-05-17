@@ -20,20 +20,23 @@ const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
 const NotiContract = (props: Props) => {
     const contract = useContract();
     const params = useParams();
-    // const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params.contractId)) : contract.state.data as Obj;
     const cT = useContractService();
-    const crrCT = (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId));
+    const paymentContract = usePaymentContract();
+    const crrCT = (paymentContract.state.data as Obj[])?.filter((item) => {
+        return String(item.id_hopdong) === String(params.contractId)
+    }) ?? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId));
+
     const service = useService();
     const componentId = useRef(uuid());
     const [signCompany, setSignCompany] = useState('');
-    const paymentContract = usePaymentContract();
+
     const isCreated = useRef(false);
     const { values, setValues } = useFormik({
         initialValues: crrCT?.map((item: Obj, idx) => {
             return {
                 dichvu: item?.id_dichvu,
                 key: uuid(),
-                sosudung: 0,
+                sosudung: 1,
                 ...item,
             }
         }),
@@ -168,6 +171,7 @@ const NotiContract = (props: Props) => {
                         (values[index] as Obj)!.sosudung = value;
                         setValues([...values]);
                     }}
+                    min={1}
                 />
             },
         },
@@ -208,7 +212,7 @@ const NotiContract = (props: Props) => {
             }
         }
     ];
-    const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
+    const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading;
     const handleSubmit = () => {
         const isInValid = values.some((item: Obj) => {
             return !(item.dongia && item.loaithue) || !(Number(item.dongia) && Number(item.loaithue));
@@ -232,7 +236,7 @@ const NotiContract = (props: Props) => {
                         id_hopdong: params.contractId
                     }
                 });
-                paymentContract.post?.(componentId.current, {
+                paymentContract.put?.(componentId.current, {
                     body: data
                 });
             }
@@ -255,10 +259,14 @@ const NotiContract = (props: Props) => {
         }
     }, [paymentContract.state.data]);
     useEffect(() => {
-        contract.get?.(componentId.current, {
-            params: [String(params?.contractId)],
-        });
-        paymentContract.get?.(componentId.current);
+        if (!contract.state.isLoading) {
+            contract.get?.(componentId.current, {
+                params: [String(params?.contractId)],
+            });
+        }
+        if (!paymentContract.state.isLoading) {
+            paymentContract.get?.(componentId.current);
+        }
         if (!cT.state.data) {
             cT.get?.(componentId.current);
         }
@@ -275,7 +283,7 @@ const NotiContract = (props: Props) => {
                 return {
                     dichvu: item?.id_dichvu,
                     key: uuid(),
-                    sosudung: 0,
+                    sosudung: 1,
                     ...item,
                 }
             }));
@@ -286,7 +294,7 @@ const NotiContract = (props: Props) => {
             {
                 props.isCreate ? (getLoading ? <div>Đang tải...</div> :
                     <div className={styles.content}>
-                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu Công ty: <input style={{ marginLeft: '0.8rem', outline: 'none' }} value={signCompany} onChange={(e) => setSignCompany(e.target.value)} /></div>
+                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <input style={{ marginLeft: '0.8rem', outline: 'none' }} value={signCompany} onChange={(e) => setSignCompany(e.target.value)} /></div>
                         <div className={styles.table}>
                             <div style={{ textAlign: 'right', marginBottom: '1.2rem' }}>
                                 <Button
@@ -295,7 +303,7 @@ const NotiContract = (props: Props) => {
                                         setValues([...values, {
                                             key: uuid(),
                                             dichvu: '',
-                                            sosudung: 0
+                                            sosudung: 1
                                         }]);
                                     }}
                                 >

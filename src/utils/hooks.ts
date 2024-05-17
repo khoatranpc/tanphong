@@ -59,7 +59,7 @@ const useUpdateManyContractService = createHookReducer('updateManycontractServic
 }, clearUpdateManyContractService);
 
 const usePaymentContract = createHookReducer('paymentContract', {
-    post: queryCreatePaymentContract,
+    put: queryCreatePaymentContract,
     get: queryGetPaymentContract
 }, clearPaymentContract);
 export {

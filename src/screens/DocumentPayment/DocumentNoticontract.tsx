@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { Obj } from '@/global';
 import { useContract, usePaymentContract, useService } from '@/utils/hooks';
 import styles from './DocumentPayment.module.scss';
+import { uuid } from '@/utils';
 
 interface Props {
     noNoti: string;
@@ -13,13 +14,14 @@ interface Props {
 const DocumentNoticontract = (props: Props) => {
     const contract = useContract();
     const params = useParams();
-    const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params.contractId)) : contract.state.data as Obj;
+    const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params?.contractId)) : contract.state.data as Obj;
     const paymentContract = usePaymentContract();
     const service = useService();
-    const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+    const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
+            key: uuid()
         }
     });
     const lastRow = [
@@ -34,7 +36,8 @@ const DocumentNoticontract = (props: Props) => {
             colheso: 0,
             coldongia: 0,
             colsosudung: 0,
-            mergeCol: true
+            mergeCol: true,
+            key: uuid()
         },
         {
             stt: 'Tổng tiền sau thuế',
@@ -47,7 +50,8 @@ const DocumentNoticontract = (props: Props) => {
             colheso: 0,
             coldongia: 0,
             colsosudung: 0,
-            mergeCol: true
+            mergeCol: true,
+            key: uuid()
         },
     ];
     crrDataPayment?.push(...lastRow);
@@ -86,7 +90,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'donvitinh',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             width: 150,
             onCell(data) {
@@ -101,7 +105,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'chisocu',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -115,7 +119,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'chisomoi',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -129,7 +133,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'heso',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -143,7 +147,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'dongia',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -157,7 +161,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'sosudung',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -171,7 +175,7 @@ const DocumentNoticontract = (props: Props) => {
             dataIndex: 'tientruocthue',
             className: 'text-center',
             render(value, record, index) {
-                return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : 0
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
         },
     ];
@@ -196,7 +200,7 @@ const DocumentNoticontract = (props: Props) => {
                         <h3>THÔNG BÁO PHÍ DỊCH VỤ<br />(Tính đến tháng {new Date().getMonth()} năm {new Date().getFullYear()})</h3>
                         <p>Kính gửi: {crrContract?.ten}</p>
                         <p>Công ty Cổ Phần Tân Phong хin gửi đến Quý Công ty lời lời cảm ơn chân thành ᴠì ѕự quan tâm, ủng hộ ᴠà tin tưởng sử dụng dịch vụ của chúng tôi trong ѕuốt thời gian qua.</p>
-                        <p>Bằng Văn bản nàу, chúng tôi хin thông báo phí sử dụng dịch vụ với các nội dung ѕau:</p>
+                        <p style={{ marginBottom: '1.2rem' }}>Bằng Văn bản nàу, chúng tôi хin thông báo phí sử dụng dịch vụ với các nội dung ѕau:</p>
                         <div className={styles.table}>
                             <Table
                                 columns={columns}
@@ -206,8 +210,14 @@ const DocumentNoticontract = (props: Props) => {
                                 pagination={false}
                             />
                         </div>
-                        <div className={styles.endDoc}>
-
+                        <p style={{ marginTop: '1.2rem' }}>Xin chân trọng cám ơn!</p>
+                        <div className={styles.end}>
+                            <div className={styles.from}>
+                                Nơi gửi:
+                            </div>
+                            <div className={styles.signCompany}>
+                                CÔNG TY CỔ PHẦN TÂN PHONG
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -9,6 +9,11 @@ import { Query } from "./axios";
 import { format } from "date-fns";
 import { ToastContent, ToastOptions, toast } from "react-toastify";
 
+const units = ["", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
+const teens = ["mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu", "mười bảy", "mười tám", "mười chín"];
+const tens = ["", "", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"];
+const thousands = ["", "nghìn", "triệu", "tỷ"];
+
 export interface RestQuery {
     /**
      * 
@@ -35,6 +40,45 @@ export interface ResultHook extends RestQuery {
         error?: boolean;
     };
     clear: () => void;
+}
+function groupToWords(n: number) {
+    let hundred = Math.floor(n / 100);
+    let ten = n % 100;
+    let word = '';
+    if (hundred > 0) {
+        word += units[hundred] + " trăm ";
+        if (ten > 0 && ten < 10) word += "lẻ ";
+    }
+
+    if (ten > 0 && ten < 10) {
+        word += units[ten];
+    } else if (ten >= 10 && ten < 20) {
+        word += teens[ten - 10];
+    } else if (ten >= 20) {
+        word += tens[Math.floor(ten / 10)];
+        if (ten % 10 > 0) word += " " + units[ten % 10];
+    }
+
+    return word.trim();
+}
+
+const numberToVNWords = (n: number) => {
+    if (n === 0) return "không";
+
+    let words = '';
+    let groupIndex = 0;
+
+    while (n > 0) {
+        let group = n % 1000;
+        if (group > 0) {
+            words = groupToWords(group) + (thousands[groupIndex] ? ' ' + thousands[groupIndex] + ' ' : '') + words;
+        }
+        n = Math.floor(n / 1000);
+        groupIndex++;
+    }
+    const lastWords = words.trim();
+    lastWords.charAt(0).toUpperCase();
+    return lastWords.charAt(0).toUpperCase() + lastWords.slice(1);
 }
 
 const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
@@ -87,5 +131,6 @@ export {
     LazyImportComponent,
     uuid,
     formatDateToString,
-    toastify
+    toastify,
+    numberToVNWords
 }
