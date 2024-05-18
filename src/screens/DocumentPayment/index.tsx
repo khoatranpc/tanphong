@@ -129,7 +129,7 @@ const BoudaryComponent = (props: Props) => {
     )
 }
 const MemoBoudaryComponent = memo(BoudaryComponent, (prevProps, nextProps) => {
-    if (((!prevProps.paymentContract.state.componentId || !nextProps.paymentContract.state.componentId) || (prevProps.paymentContract.state.componentId && nextProps.paymentContract.state.componentId && prevProps.paymentContract.state.componentId === nextProps.paymentContract.state.componentId)) && nextProps.paymentContract.state.data) {
+    if (((!prevProps.paymentContract.state.componentId || !nextProps.paymentContract.state.componentId) || (prevProps.paymentContract.state.componentId && nextProps.paymentContract.state.componentId && prevProps.paymentContract.state.componentId === nextProps.paymentContract.state.componentId)) && nextProps.paymentContract.state.data && !nextProps.paymentContract.state.data.error) {
         return false;
     }
     return true;

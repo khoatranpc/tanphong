@@ -25,7 +25,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                         return response;
                     },
                     (error) => {
-                        return error.response;
+                        throw error.response;
                     }
                 );
                 break;
@@ -35,7 +35,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                         return response;
                     },
                     (error) => {
-                        return error.response;
+                        throw error.response;
                     }
                 );
                 break;
@@ -45,7 +45,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                         return response;
                     },
                     (error) => {
-                        return error.response;
+                        throw error.response;
                     }
                 );
                 break;
@@ -55,7 +55,7 @@ export default async function actionRequest(uri: string, method: Method, { paylo
                         return response;
                     },
                     (error) => {
-                        return error.response;
+                        throw error.response;
                     }
                 );
                 break;
@@ -65,10 +65,10 @@ export default async function actionRequest(uri: string, method: Method, { paylo
         return {
             data: {
                 isLoading: false,
-                message: (error as Obj).message as string,
+                message: (error as Obj).message as string || (error as Obj).data.message,
                 success: false,
                 data: null,
-                error: true
+                error: true,
             },
         }
     }

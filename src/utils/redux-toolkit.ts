@@ -31,7 +31,7 @@ const initState: State = {
 export const createRequest = (type: string, api: string, method: Method): any => {
     return createAsyncThunk(type, async (payload: any) => {
         const rs = await actionRequest(api, method, payload);
-        return rs.data;
+        return rs?.data;
     });
 }
 

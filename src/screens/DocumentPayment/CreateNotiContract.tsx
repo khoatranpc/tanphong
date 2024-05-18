@@ -239,7 +239,6 @@ const NotiContract = (props: Props, ref: any) => {
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading || tmpDataPayment.state.isLoading;
     const handleSubmit = () => {
         const isInValid = values.some((item: Obj) => {
-            console.log(item);
             return !(item.dongia && item.loaithue) || !(Number(item.dongia) && Number(item.loaithue));
         });
         if (isInValid) {
@@ -268,10 +267,10 @@ const NotiContract = (props: Props, ref: any) => {
         }
     }
     useEffect(() => {
-        if (paymentContract.state.data && isCreated.current) {
+        if (paymentContract.state.data && isCreated.current && props.isUpdate) {
             isCreated.current = false;
             if (paymentContract.state.success) {
-                toastify('Lưu thông tin thanh toán thàn công!', {
+                toastify('Lưu thông tin thanh toán thành công!', {
                     type: 'success'
                 });
                 paymentContract.clear();
@@ -279,10 +278,10 @@ const NotiContract = (props: Props, ref: any) => {
                 toastify('Lưu thông tin thất bại, vui lòng thử lại sau!', {
                     type: 'error'
                 });
-                paymentContract.clear(); paymentContract.clear();
+                paymentContract.clear();
             }
         }
-    }, [paymentContract.state.data]);
+    }, [paymentContract.state.data, props.isUpdate]);
     useEffect(() => {
         setSignCompany(!props.isCreate ? props.noNoti.split("ĐNTT-DV/")[1] : '');
     }, [props.noNoti, props.isCreate]);
@@ -302,7 +301,17 @@ const NotiContract = (props: Props, ref: any) => {
                 }
             }, undefined, undefined, "GET");
         }
-    }, [tmpDataPayment]);
+        if (tmpDataPayment.state.data && tmpDataPayment.state.data.error && !tmpDataPayment.state.isLoading) {
+            toastify(tmpDataPayment.state.data.message, {
+                type: 'error'
+            });
+            tmpDataPayment.get?.(props.parentComponentId, {
+                queryParams: {
+                    id_hopdong: params?.contractId
+                }
+            }, undefined, undefined, "GET");
+        }
+    }, [tmpDataPayment.state.data]);
     return (
         <div className={styles.notiContract} >
             {!props.isCreate && <Switch checkedChildren="Chỉnh sửa" unCheckedChildren="Văn bản" className={styles.switch} defaultChecked={!isViewDoc} onChange={(checked) => setIsViewDoc(!checked)} />}
