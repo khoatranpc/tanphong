@@ -8,6 +8,7 @@ import { State } from "./redux-toolkit";
 import { Query } from "./axios";
 import { format } from "date-fns";
 import { ToastContent, ToastOptions, toast } from "react-toastify";
+import { Method } from "axios";
 
 const units = ["", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín"];
 const teens = ["mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu", "mười bảy", "mười tám", "mười chín"];
@@ -24,10 +25,10 @@ export interface RestQuery {
      * 
      * @returns 
      */
-    get?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
-    post?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
-    put?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void) => void;
-    delete?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void) => void;
+    get?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void, method?: Method) => void;
+    post?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void, method?: Method) => void;
+    put?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: () => void, method?: Method) => void;
+    delete?: (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void, method?: Method) => void;
 }
 
 export interface ResultHook extends RestQuery {
@@ -38,6 +39,7 @@ export interface ResultHook extends RestQuery {
         success: boolean;
         componentId?: string;
         error?: boolean;
+        method?: Method
     };
     clear: () => void;
 }
@@ -99,8 +101,8 @@ const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
         const query: RestQuery = {};
         for (const key in queryThunk) {
             if (Object.prototype.hasOwnProperty.call(queryThunk, key)) {
-                query[key as keyof RestQuery] = (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void) => {
-                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId, isReload, callbackFnc }));
+                query[key as keyof RestQuery] = (componentId?: string, query?: Query, isReload?: boolean, callbackFnc?: (isSuccess?: boolean, message?: string) => void, method?: Method) => {
+                    dispatch((queryThunk[key as keyof RestQuery] as any)({ payload: query, componentId, isReload, callbackFnc, method }));
                 }
             }
         }

@@ -1,13 +1,12 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { memo, useEffect, useRef, useState } from 'react';
 import { Obj } from '@/global';
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
 import { PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
-import NotiContract from './CreateNotiContract';
 import PayRequest from './PayRequest';
-import { uuid } from '@/utils';
+import { ResultHook, uuid } from '@/utils';
 import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import styles from './DocumentPayment.module.scss';
@@ -26,11 +25,13 @@ const DocumentLabel: Record<Document, string> = {
     NOTI_CONTRACT: 'Thông báo dịch vụ',
     PAY_REQUEST: 'Đề nghị thanh toán'
 }
-
-const DocumentPayment = () => {
+interface Props {
+    paymentContract: ResultHook;
+}
+const BoudaryComponent = (props: Props) => {
     const [crrDoc, setCrrDoc] = useState<Document>(Document.NOTI_CONTRACT);
     const params = useParams();
-    const paymentContract = usePaymentContract();
+    const paymentContract = props.paymentContract;
     const crrDataPayment = (paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId)) ?? [];
     const selectGroup = groupPaymentByNo(crrDataPayment);
     const [noNotiContract, setNoNoticontract] = useState("");
@@ -48,7 +49,7 @@ const DocumentPayment = () => {
 
 
     const contentDoc: Record<Document, React.ReactNode> = {
-        NOTI_CONTRACT: isCreate ? <CreateNotiContract ref={docRef} noNoti={noNotiContract} isCreate={isCreate} /> : <NotiContract noNoti={noNotiContract} ref={docRef} isCreate={isCreate} />,
+        NOTI_CONTRACT: <CreateNotiContract ref={docRef} noNoti={noNotiContract} isCreate={isCreate} paymentContract={paymentContract} parentComponentId={componentId.current} />,
         PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} ref={docRef} />
     }
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
@@ -56,7 +57,11 @@ const DocumentPayment = () => {
         contract.get?.(componentId.current, {
             params: [String(params?.contractId)],
         });
-        paymentContract.get?.(componentId.current);
+        paymentContract.get?.(componentId.current, {
+            queryParams: {
+                id_hopdong: params?.contractId
+            }
+        });
         cT.get?.(componentId.current);
         service.get?.(componentId.current);
     }, []);
@@ -112,6 +117,16 @@ const DocumentPayment = () => {
             </div>
         </div>
     )
+}
+const MemoBoudaryComponent = memo(BoudaryComponent, (prevProps, nextProps) => {
+    if (((!prevProps.paymentContract.state.componentId || !nextProps.paymentContract.state.componentId) || (prevProps.paymentContract.state.componentId && nextProps.paymentContract.state.componentId && prevProps.paymentContract.state.componentId === nextProps.paymentContract.state.componentId)) && nextProps.paymentContract.state.data) {
+        return false;
+    }
+    return true;
+});
+const DocumentPayment = () => {
+    const paymentContract = usePaymentContract();
+    return <MemoBoudaryComponent paymentContract={paymentContract} />
 }
 
 export default DocumentPayment;

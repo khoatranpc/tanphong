@@ -1,5 +1,5 @@
 "use client";
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { ColumnsType } from 'antd/es/table';
 import { DefaultOptionType } from 'antd/es/select';
 import { useParams } from 'next/navigation';
@@ -7,7 +7,7 @@ import { Button, Input, InputNumber, Select, Switch, Table } from 'antd';
 import { useFormik } from 'formik';
 import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
 import { Obj } from '@/global';
-import { toastify, uuid } from '@/utils';
+import { ResultHook, toastify, uuid } from '@/utils';
 import DocumentNoticontract from './DocumentNoticontract';
 import styles from './DocumentPayment.module.scss';
 
@@ -16,6 +16,8 @@ interface Props {
     isCreate?: boolean;
     isUpdate?: boolean;
     ref: React.RefObject<any>;
+    paymentContract: ResultHook;
+    parentComponentId: string;
 }
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
@@ -24,11 +26,12 @@ const NotiContract = (props: Props, ref: any) => {
     const params = useParams();
     const cT = useContractService();
     const service = useService();
-    const paymentContract = usePaymentContract();
+    const paymentContract = props.paymentContract;
+    const tmpDataPayment = usePaymentContract();
     const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId)) : ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
         return {
             ...item,
-            dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
+            dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.id_dichvu,
             key: uuid()
         }
     }) as Obj[];
@@ -201,11 +204,23 @@ const NotiContract = (props: Props, ref: any) => {
         {
             key: 'ACT',
             title: 'Hành động',
-            render(_, __, index) {
+            className: 'text-center',
+            render(_, record: any, index) {
                 return <Button
+                    disabled={props.isCreate}
                     size="small"
                     danger
                     onClick={() => {
+                        if (!isViewDoc) {
+                            if (crrCT?.[index]) {
+                                paymentContract.delete?.(componentId.current, {
+                                    params: [record.id]
+                                }, undefined, undefined, 'DELETE');
+                            } else {
+                                values.splice(index, 1);
+                                setValues([...values]);
+                            }
+                        }
                     }}
                 >
                     Xoá
@@ -213,7 +228,7 @@ const NotiContract = (props: Props, ref: any) => {
             }
         }
     ];
-    const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading;
+    const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading || tmpDataPayment.state.isLoading;
     const handleSubmit = () => {
         const isInValid = values.some((item: Obj) => {
             return !(item.dongia && item.loaithue) || !(Number(item.dongia) && Number(item.loaithue));
@@ -237,9 +252,9 @@ const NotiContract = (props: Props, ref: any) => {
                         id_hopdong: params.contractId
                     }
                 });
-                (paymentContract[props.isCreate ? 'post' : 'put'])?.(componentId.current, {
+                (paymentContract[props.isCreate ? 'post' : 'put'])?.(props.parentComponentId, {
                     body: data
-                });
+                }, undefined, undefined, props.isCreate ? 'post' : 'put');
             }
         }
     }
@@ -267,14 +282,26 @@ const NotiContract = (props: Props, ref: any) => {
             setValues([...crrCT as any]);
         }
     }, [props.isUpdate, props.isCreate, props.noNoti, cT.state.data, paymentContract.state.data]);
+    useEffect(() => {
+        if (tmpDataPayment.state.method === 'DELETE' && tmpDataPayment.state.success) {
+            toastify('Xoá thông tin thành công', {
+                type: 'success'
+            });
+            tmpDataPayment.get?.(props.parentComponentId, {
+                queryParams: {
+                    id_hopdong: params?.contractId
+                }
+            }, undefined, undefined, "GET");
+        }
+    }, [tmpDataPayment]);
     return (
         <div className={styles.notiContract} >
             {!props.isCreate && <Switch checkedChildren="Chỉnh sửa" unCheckedChildren="Văn bản" className={styles.switch} defaultChecked={!isViewDoc} onChange={(checked) => setIsViewDoc(!checked)} />}
             {
                 isViewDoc ?
-                    <DocumentNoticontract noNoti={props.noNoti} ref={props.ref} /> :
+                    <DocumentNoticontract noNoti={props.noNoti} ref={ref} /> :
                     <div className={styles.content}>
-                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <input style={{ marginLeft: '0.8rem', outline: 'none' }} value={signCompany} onChange={(e) => {
+                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
                             if (!props.isUpdate) {
                                 setSignCompany(e.target.value);
                             }
@@ -313,9 +340,16 @@ const NotiContract = (props: Props, ref: any) => {
                         </div>
                     </div>
             }
-
         </div>
     )
 }
 
-export default forwardRef(NotiContract);
+export default memo(forwardRef(NotiContract), (prevProps, nextProps) => {
+    if (!prevProps.paymentContract.state.componentId) {
+        return false;
+    }
+    if (prevProps.paymentContract.state.componentId && nextProps.paymentContract.state.componentId && prevProps.paymentContract.state.componentId === nextProps.paymentContract.state.componentId) {
+        return false;
+    }
+    return true;
+});
