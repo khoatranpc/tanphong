@@ -64,6 +64,12 @@ const BoudaryComponent = (props: Props) => {
         });
         cT.get?.(componentId.current);
         service.get?.(componentId.current);
+        return () => {
+            contract.get?.();
+            paymentContract.get?.();
+            cT.get?.();
+            service.get?.();
+        }
     }, []);
     return (
         <div className={styles.documentPayment}>
