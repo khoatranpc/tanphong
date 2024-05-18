@@ -111,7 +111,11 @@ const BoudaryComponent = (props: Props) => {
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
-                    {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} />}
+                    {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} onClick={() => {
+                        if (docRef.current) {
+                            handlePrint();
+                        }
+                    }} />}
                 </div>
                 {contentDoc[crrDoc]}
             </div>
