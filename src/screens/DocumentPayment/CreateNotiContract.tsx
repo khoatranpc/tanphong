@@ -301,11 +301,9 @@ const NotiContract = (props: Props, ref: any) => {
                 isViewDoc ?
                     <DocumentNoticontract noNoti={props.noNoti} ref={ref} /> :
                     <div className={styles.content}>
-                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
-                            if (isViewDoc) {
-                                setSignCompany(e.target.value);
-                            }
-                        }} /></div>
+                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: {props.noNoti ? props.noNoti : <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
+                            setSignCompany(e.target.value);
+                        }} />}</div>
                         <div className={styles.table}>
                             <div style={{ textAlign: 'right', marginBottom: '1.2rem' }}>
                                 <Button
