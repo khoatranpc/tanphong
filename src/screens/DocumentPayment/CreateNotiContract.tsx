@@ -302,7 +302,7 @@ const NotiContract = (props: Props, ref: any) => {
                     <DocumentNoticontract noNoti={props.noNoti} ref={ref} /> :
                     <div className={styles.content}>
                         <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
-                            if (!props.isUpdate) {
+                            if (isViewDoc) {
                                 setSignCompany(e.target.value);
                             }
                         }} /></div>

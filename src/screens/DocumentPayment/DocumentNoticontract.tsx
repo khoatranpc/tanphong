@@ -7,7 +7,6 @@ import { Obj } from '@/global';
 import { uuid } from '@/utils';
 import { useContract, usePaymentContract, useService } from '@/utils/hooks';
 import styles from './DocumentPayment.module.scss';
-import CreateNotiContract from './CreateNotiContract';
 
 interface Props {
     noNoti: string;
@@ -19,7 +18,6 @@ const DocumentNoticontract = (props: Props, ref: any) => {
     const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params?.contractId)) : contract.state.data as Obj;
     const paymentContract = usePaymentContract();
     const service = useService();
-    const [update, setUpdate] = useState(false);
     const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
         return {
             ...item,
