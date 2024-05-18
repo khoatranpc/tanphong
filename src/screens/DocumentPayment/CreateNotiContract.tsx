@@ -28,7 +28,15 @@ const NotiContract = (props: Props, ref: any) => {
     const service = useService();
     const paymentContract = props.paymentContract;
     const tmpDataPayment = usePaymentContract();
-    const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId)) : ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+    const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId))?.map((item) => {
+        return {
+            ...item,
+            dichvu: ((service.state.data as Obj[])?.find(sv => {
+                return String(sv.id_dichvu) === String(item.id_dichvu)
+            }))?.id_dichvu,
+            key: uuid()
+        }
+    }) : ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.id_dichvu,
@@ -231,6 +239,7 @@ const NotiContract = (props: Props, ref: any) => {
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading || tmpDataPayment.state.isLoading;
     const handleSubmit = () => {
         const isInValid = values.some((item: Obj) => {
+            console.log(item);
             return !(item.dongia && item.loaithue) || !(Number(item.dongia) && Number(item.loaithue));
         });
         if (isInValid) {
