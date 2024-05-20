@@ -60,13 +60,19 @@ th.text-left {
 
 .printPageBill {
   max-width: 100%;
-  padding: 4.2rem;
+  padding-top: 1.8rem;
+
+  table {
+    * {
+      padding: 0.3rem !important;
+    }
+  }
 
   .document {
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-width: 70%;
+    max-width: 80%;
     margin: auto;
 
     .headerNotiDoc {

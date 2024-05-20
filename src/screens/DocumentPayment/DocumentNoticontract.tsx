@@ -105,7 +105,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             render(value, record, index) {
                 return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
             },
-            width: 150,
+            width: 90,
             onCell(data) {
                 return {
                     colSpan: data['coldonvitinh'] ?? 1
