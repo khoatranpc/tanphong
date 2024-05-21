@@ -1,7 +1,7 @@
 "use client";
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef } from 'react';
 import { useParams } from 'next/navigation';
-import { Switch, Table } from 'antd';
+import { Table } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Obj } from '@/global';
 import { uuid } from '@/utils';
@@ -18,7 +18,9 @@ const DocumentNoticontract = (props: Props, ref: any) => {
     const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params?.contractId)) : contract.state.data as Obj;
     const paymentContract = usePaymentContract();
     const service = useService();
-    const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+    const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
+    const crrDataPayment: Obj[] = dataPaymentContract?.thanhtoan?.map((item: any) => {
+        console.log(item);
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
@@ -199,13 +201,23 @@ const DocumentNoticontract = (props: Props, ref: any) => {
                     <div className={`document ${styles.document}`} ref={ref}>
                         <div className={`flex headerNotiDoc ${styles.headerNotiDoc} ${styles.flex} `}>
                             <div className={`flex directionColumn ${styles.flex} ${styles.directionColumn} `}>
-                                <h3 style={{ textDecoration: 'underline' }}>CÔNG TY CỔ PHẦN TÂN PHONG</h3>
+                                <h3>
+                                    CÔNG TY CỔ PHẦN
+                                    <br />
+                                    <span>
+                                        TÂN PHONG
+                                    </span>
+                                    <hr style={{ maxWidth: '70%', margin: 'auto', borderTop: 'none', borderBottom: '1px solid black' }} />
+                                </h3>
                                 <p>Số: {props.noNoti}</p>
                             </div>
                             <div>
                                 <div className={`flex directionColumn slogan ${styles.flex} ${styles.directionColumn} ${styles.slogan}`} style={{ marginBottom: '0.8rem' }}>
                                     <h3>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</h3>
-                                    <h3><b>Độc Lập - Tự Do - Hạnh Phúc</b></h3>
+                                    <h3>
+                                        <b>Độc Lập - Tự Do - Hạnh Phúc</b>
+                                        <hr style={{ maxWidth: '50%', margin: 'auto', borderTop: 'none', borderBottom: '1px solid black' }} />
+                                    </h3>
                                 </div>
                                 <p style={{ fontSize: '1.6rem', textAlign: 'right' }} >Hà Nội, ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</p>
                             </div>
@@ -228,6 +240,11 @@ const DocumentNoticontract = (props: Props, ref: any) => {
                             <div className={`end ${styles.end}`}>
                                 <div className={`from ${styles.from}`}>
                                     Nơi gửi:
+                                    <div className='text-center'>
+                                        Như trên
+                                        <br />
+                                        Lưu văn thư
+                                    </div>
                                 </div>
                                 <div className={`signCompany ${styles.signCompany}`}>
                                     CÔNG TY CỔ PHẦN TÂN PHONG

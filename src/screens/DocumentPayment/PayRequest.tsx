@@ -21,8 +21,8 @@ const PayRequest = (props: Props, ref: any) => {
     const contract = useContract();
     const crrContract = Array.isArray(contract.state.data as Obj[]) ? (contract.state.data as Obj[])?.find((contract) => String(contract.id_hopdong) === String(params?.contractId)) : contract.state.data as Obj;
     const service = useService();
-
-    const crrDataPayment: Obj[] = ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+    const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
+    const crrDataPayment: Obj[] = (dataPaymentContract?.thanhtoan as any[])?.map((item) => {
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
@@ -68,7 +68,8 @@ const PayRequest = (props: Props, ref: any) => {
             coldichvu: 3,
             coltientruocthue: 0,
             colthue: 0,
-            key: uuid()
+            key: uuid(),
+            tiensauthue: dataPaymentContract?.giamtru
         },
         {
             dichvu: 'Tổng tiền sau thuế',
@@ -95,7 +96,7 @@ const PayRequest = (props: Props, ref: any) => {
                 }
             }, {
                 tiensauthue: 0
-            }).tiensauthue,
+            }).tiensauthue - dataPaymentContract?.giamtru,
             key: uuid()
         },
     ];
@@ -182,9 +183,9 @@ const PayRequest = (props: Props, ref: any) => {
                 <div className={styles.companyInfo}>
                     <h2>CÔNG TY CỔ PHẦN TÂN PHONG</h2>
                     <div className={styles.address}>
-                        <p>Địa chỉ: Khu 15, TT Hùng Sơn, Huyện Lâm Thao, Tỉnh Phú Thọ</p>
+                        <p style={{ textAlign: 'center' }}>Địa chỉ: Khu 15, TT Hùng Sơn, Huyện Lâm Thao, Tỉnh Phú Thọ</p>
                         <p className={styles.connect}>{'Website: www.tanphonggroup.com.vn    Email: tanphongtea@gmail.com'}</p>
-                        <p style={{ textAlign: 'left' }}>Tel:  {'(+84) 904 527 527'}</p>
+                        <p>Tel:  {'(+84) 904 527 527'}</p>
                     </div>
                 </div>
             </div>
@@ -227,6 +228,11 @@ const PayRequest = (props: Props, ref: any) => {
                 <div className={styles.end}>
                     <div className={styles.from}>
                         Nơi gửi:
+                        <div className='text-center'>
+                            Như trên
+                            <br />
+                            Lưu văn thư
+                        </div>
                     </div>
                     <div className={styles.signCompany}>
                         CÔNG TY CỔ PHẦN TÂN PHONG

@@ -28,6 +28,7 @@ const NotiContract = (props: Props, ref: any) => {
     const service = useService();
     const paymentContract = props.paymentContract;
     const tmpDataPayment = usePaymentContract();
+    const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
     const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId))?.map((item) => {
         return {
             ...item,
@@ -36,7 +37,7 @@ const NotiContract = (props: Props, ref: any) => {
             }))?.id_dichvu,
             key: uuid()
         }
-    }) : ((paymentContract.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti))?.map((item) => {
+    }) : (dataPaymentContract?.thanhtoan as Obj[])?.map((item) => {
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.id_dichvu,
@@ -46,10 +47,11 @@ const NotiContract = (props: Props, ref: any) => {
     const componentId = useRef(uuid());
     const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
     const [isViewDoc, setIsViewDoc] = useState(false);
+    const [discount, setDiscount] = useState(0);
 
     const isCreated = useRef(false);
     const { values, setValues } = useFormik({
-        initialValues: crrCT?.map((item: Obj, idx) => {
+        initialValues: crrCT?.map((item: any, idx) => {
             return {
                 dichvu: item?.id_dichvu,
                 key: uuid(),
@@ -239,7 +241,7 @@ const NotiContract = (props: Props, ref: any) => {
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading || paymentContract.state.isLoading || tmpDataPayment.state.isLoading;
     const handleSubmit = () => {
         const isInValid = values.some((item: Obj) => {
-            return !(item.dongia && item.loaithue) || !(Number(item.dongia) && Number(item.loaithue));
+            return !(typeof item.dongia === 'number' && typeof item.loaithue === 'number');
         });
         if (isInValid) {
             toastify('Bạn chưa điền một số thông tin về đơn giá hoặc loại thuế!', {
@@ -252,16 +254,24 @@ const NotiContract = (props: Props, ref: any) => {
                 });
             } else {
                 isCreated.current = true;
-                const data = values.map((item) => {
-                    return {
-                        ...item,
-                        sodntt: `${new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}/${new Date().getFullYear()}/TB-DV/${signCompany}`,
-                        sotbdv: `${new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}/${new Date().getFullYear()}/ĐNTT-DV/${signCompany}`,
+                const sodntt = `${new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}/${new Date().getFullYear()}/TB-DV/${signCompany}`;
+                const sotbdv = `${new Date().getMonth() + 1 < 10 ? `0${new Date().getMonth() + 1}` : new Date().getMonth() + 1}/${new Date().getFullYear()}/ĐNTT-DV/${signCompany}`;
+                const payload = {
+                    thanhtoan: values,
+                    ...props.isCreate ? {
+                        thoigiantao: new Date(),
+                        sodntt,
+                        sotbdv,
                         id_hopdong: params.contractId
-                    }
-                });
+                    } : {
+                        id: dataPaymentContract?.id,
+                        sodntt: dataPaymentContract?.sodntt,
+                        sotbdv: dataPaymentContract?.sotbdv,
+                    },
+                    giamtru: discount
+                };
                 (paymentContract[props.isCreate ? 'post' : 'put'])?.(props.parentComponentId, {
-                    body: data
+                    body: payload
                 }, undefined, undefined, props.isCreate ? 'post' : 'put');
             }
         }
@@ -288,6 +298,9 @@ const NotiContract = (props: Props, ref: any) => {
     useEffect(() => {
         if (crrCT) {
             setValues([...crrCT as any]);
+        }
+        if (paymentContract.state.data) {
+            setDiscount(dataPaymentContract?.giamtru ?? 0);
         }
     }, [props.isUpdate, props.isCreate, props.noNoti, cT.state.data, paymentContract.state.data]);
     useEffect(() => {
@@ -330,7 +343,8 @@ const NotiContract = (props: Props, ref: any) => {
                                         setValues([...values, {
                                             key: uuid(),
                                             dichvu: '',
-                                            sosudung: 1
+                                            sosudung: 1,
+                                            id_hopdongthanhtoan: dataPaymentContract?.id
                                         }]);
                                     }}
                                 >
@@ -344,6 +358,20 @@ const NotiContract = (props: Props, ref: any) => {
                                 pagination={false}
                                 loading={getLoading}
                             />
+                            <div className={styles.discount}>
+                                <label>Giảm trừ:</label>
+                                <InputNumber<number>
+                                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                    parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
+                                    size="small"
+                                    value={discount}
+                                    min={0}
+                                    onChange={(value) => {
+                                        console.log(value);
+                                        setDiscount(value ?? 0);
+                                    }}
+                                />
+                            </div>
                             <div style={{ textAlign: 'right', marginTop: '1.2rem' }}>
                                 <Button size="small" onClick={() => {
                                     handleSubmit();
