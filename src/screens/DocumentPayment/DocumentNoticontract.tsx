@@ -20,7 +20,6 @@ const DocumentNoticontract = (props: Props, ref: any) => {
     const service = useService();
     const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
     const crrDataPayment: Obj[] = dataPaymentContract?.thanhtoan?.map((item: any) => {
-        console.log(item);
         return {
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.tendichvu,
