@@ -69,9 +69,9 @@ const BoudaryComponent = (props: Props) => {
             const pdf = new jsPDF(crrDoc === Document.NOTI_CONTRACT ? 'l' : 'p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
             pdf.addImage(imgData, '', 0, crrDoc === Document.NOTI_CONTRACT ? 12 : 0, pdfWidth, 0);
-            pdf.save(noNotiContract);
+            // pdf.save(noNotiContract);
             const pdfBlob = pdf.output('blob');
-            // handlePrint();
+            handlePrint();
             const formData = new FormData();
             formData.append('file', pdfBlob, `${noNotiContract}.pdf`);
             formData.append('mahopdong', noNotiContract)
