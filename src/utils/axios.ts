@@ -1,11 +1,11 @@
-import axios, { AxiosHeaders } from "axios";
+import axios, { RawAxiosRequestHeaders } from "axios";
 import { Obj } from "@/global";
 
 export interface Query {
     body?: Obj | Array<any>;
     queryParams?: Obj;
     params?: string[];
-    headers?: AxiosHeaders
+    headers?: RawAxiosRequestHeaders;
 }
 
 const httpClient = axios.create({

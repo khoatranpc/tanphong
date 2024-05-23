@@ -1,13 +1,15 @@
 "use client";
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Obj } from '@/global';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
 import { PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
 import { ResultHook, uuid } from '@/utils';
-import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
+import { useContract, useContractService, usePaymentContract, useSendMailBillContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import styles from './DocumentPayment.module.scss';
 import CreateNotiContract from './CreateNotiContract';
@@ -42,6 +44,7 @@ const BoudaryComponent = (props: Props) => {
     const cT = useContractService();
     const service = useService();
     const docRef = useRef(null);
+    const sendmailBillContract = useSendMailBillContract();
     const handlePrint = useReactToPrint({
         content: () => docRef.current,
         bodyClass: 'printPageBill'
@@ -53,6 +56,26 @@ const BoudaryComponent = (props: Props) => {
         PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} ref={docRef} />
     }
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
+    const generatePdf = async () => {
+        const content = docRef.current;
+        if (content) {
+            const canvas = await html2canvas(content);
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF();
+            pdf.addImage(imgData, 'PNG', 0, 0, 0, 0);
+            const pdfBlob = pdf.output('blob');
+
+            // Create a FormData object to send the PDF file
+            const formData = new FormData();
+            formData.append('file', pdfBlob, 'document.pdf');
+            sendmailBillContract.post?.(undefined, {
+                body: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+        }
+    };
     useEffect(() => {
         contract.get?.(componentId.current, {
             params: [String(params?.contractId)],
@@ -119,7 +142,8 @@ const BoudaryComponent = (props: Props) => {
                     })}
                     {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} onClick={() => {
                         if (docRef.current) {
-                            handlePrint();
+                            // handlePrint();
+                            generatePdf();
                         }
                     }} />}
                 </div>

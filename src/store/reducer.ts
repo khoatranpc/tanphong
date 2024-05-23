@@ -7,6 +7,7 @@ import propertyStorage from './reducers/storage/property.reducer';
 import typePropertyStorage from './reducers/storage/typeProperty.reducer';
 import updateManycontractServiceStorage from './reducers/storage/updateManyContractService.reducer';
 import paymentContract from './reducers/storage/paymentContract.reducer';
+import sendmailBillContract from './reducers/sendmail.reducer';
 
 const rootReducer = {
     exampleReducer,
@@ -17,7 +18,8 @@ const rootReducer = {
     propertyStorage,
     typePropertyStorage,
     updateManycontractServiceStorage,
-    paymentContract
+    paymentContract,
+    sendmailBillContract
 }
 
 export default rootReducer;
