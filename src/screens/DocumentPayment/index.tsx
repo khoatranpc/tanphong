@@ -142,7 +142,7 @@ const BoudaryComponent = (props: Props) => {
                     })}
                     {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} onClick={() => {
                         if (docRef.current) {
-                            // handlePrint();
+                            handlePrint();
                             generatePdf();
                         }
                     }} />}
