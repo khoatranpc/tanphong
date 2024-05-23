@@ -12,6 +12,7 @@ const WrappedPage = (props: { children: React.ReactNode }) => {
     <html lang="en">
       <head>
         <title>Tan Phong Joint Stock Company</title>
+        <meta httpEquiv="Content-Type" content="text/html;charset=UTF-8" charSet="UTF-8" />
       </head>
       <body className="container" suppressHydrationWarning={true}>
         <div className="logo">

@@ -18,6 +18,7 @@ interface Props {
     ref: React.RefObject<any>;
     paymentContract: ResultHook;
     parentComponentId: string;
+    id: string;
 }
 const filterOptionSelect = (input: string, option?: DefaultOptionType) =>
     (String(option?.label) ?? '').toLowerCase().includes(input.toLowerCase());
@@ -330,7 +331,7 @@ const NotiContract = (props: Props, ref: any) => {
             {!props.isCreate && <Switch checkedChildren="Chỉnh sửa" unCheckedChildren="Văn bản" className={styles.switch} defaultChecked={!isViewDoc} onChange={(checked) => setIsViewDoc(!checked)} />}
             {
                 isViewDoc ?
-                    <DocumentNoticontract noNoti={props.noNoti} ref={ref} /> :
+                    <DocumentNoticontract noNoti={props.noNoti} ref={ref} id={props.id} /> :
                     <div className={styles.content}>
                         <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: {props.noNoti ? props.noNoti : <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
                             setSignCompany(e.target.value);

@@ -3,16 +3,21 @@ import React, { memo, useEffect, useRef, useState } from 'react';
 import { Obj } from '@/global';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// Gán các font cho pdfmake
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
 import { PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
-import { ResultHook, uuid } from '@/utils';
+import { ResultHook, toastify, uuid } from '@/utils';
 import { useContract, useContractService, usePaymentContract, useSendMailBillContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
-import styles from './DocumentPayment.module.scss';
 import CreateNotiContract from './CreateNotiContract';
+import styles from './DocumentPayment.module.scss';
 
 export interface TypeDocument {
     NOTI_CONTRACT: string;
@@ -52,22 +57,24 @@ const BoudaryComponent = (props: Props) => {
 
 
     const contentDoc: Record<Document, React.ReactNode> = {
-        NOTI_CONTRACT: <CreateNotiContract ref={docRef} noNoti={noNotiContract} isCreate={isCreate} paymentContract={paymentContract} parentComponentId={componentId.current} />,
-        PAY_REQUEST: <PayRequest noNoti={noNotiContract} noPayrequest={noPayrequest} ref={docRef} />
+        NOTI_CONTRACT: <CreateNotiContract id="print" ref={docRef} noNoti={noNotiContract} isCreate={isCreate} paymentContract={paymentContract} parentComponentId={componentId.current} />,
+        PAY_REQUEST: <PayRequest id="print" noNoti={noNotiContract} noPayrequest={noPayrequest} ref={docRef} />
     }
     const getLoading = contract.state.isLoading || cT.state.isLoading || service.state.isLoading;
     const generatePdf = async () => {
-        const content = docRef.current;
+        const content = docRef.current as any;
         if (content) {
             const canvas = await html2canvas(content);
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 0, 0, 0, 0);
+            const pdf = new jsPDF(crrDoc === Document.NOTI_CONTRACT ? 'l' : 'p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            pdf.addImage(imgData, '', 0, crrDoc === Document.NOTI_CONTRACT ? 12 : 0, pdfWidth, 0);
+            pdf.save(noNotiContract);
             const pdfBlob = pdf.output('blob');
-
-            // Create a FormData object to send the PDF file
+            // handlePrint();
             const formData = new FormData();
-            formData.append('file', pdfBlob, 'document.pdf');
+            formData.append('file', pdfBlob, `${noNotiContract}.pdf`);
+            formData.append('mahopdong', noNotiContract)
             sendmailBillContract.post?.(undefined, {
                 body: formData,
                 headers: {
@@ -94,6 +101,20 @@ const BoudaryComponent = (props: Props) => {
             service.get?.();
         }
     }, []);
+    useEffect(() => {
+        if (sendmailBillContract.state.data) {
+            if (sendmailBillContract.state.success) {
+                toastify('Đã gửi thông báo tới khách hàng!', {
+                    type: 'success'
+                });
+            } else {
+                toastify('Có lỗi xảy ra, vui lòng thử lại!', {
+                    type: 'error'
+                });
+            }
+            sendmailBillContract.clear();
+        }
+    }, [sendmailBillContract.state.data]);
     return (
         <div className={styles.documentPayment}>
             <div className={styles.list}>
@@ -135,17 +156,22 @@ const BoudaryComponent = (props: Props) => {
                             onClick={() => {
                                 setCrrDoc(item as Document);
                             }}
-                            className={`${crrDoc === item ? styles.active : ''}`}
+                            className={`${crrDoc === item ? styles.active : ''} ${styles.itemTab}`}
                         >
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
-                    {crrDoc && <PrinterOutlined style={{ marginLeft: 'auto' }} onClick={() => {
-                        if (docRef.current) {
-                            handlePrint();
-                            generatePdf();
-                        }
-                    }} />}
+                    {crrDoc && <Button
+                        style={{ marginLeft: 'auto' }}
+                        onClick={() => {
+                            if (docRef.current) {
+                                generatePdf();
+                            }
+                        }}
+                        loading={sendmailBillContract.state.isLoading}
+                    >
+                        <PrinterOutlined />
+                    </Button>}
                 </div>
                 {contentDoc[crrDoc]}
             </div>

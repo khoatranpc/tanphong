@@ -1,19 +1,18 @@
 "use client";
 import React, { forwardRef } from 'react';
-import Image from 'next/image';
 import { Table } from 'antd';
 import { useParams } from 'next/navigation';
 import { ColumnsType } from 'antd/es/table';
 import { Obj } from '@/global';
 import { numberToVNWords, uuid } from '@/utils';
 import { useContract, usePaymentContract, useService } from '@/utils/hooks';
-import logo from '@/assets/imgs/hp.png';
 import styles from './DocumentPayment.module.scss';
 
 interface Props {
     noNoti: string;
     noPayrequest: string;
     ref: React.RefObject<any>;
+    id: string;
 }
 const PayRequest = (props: Props, ref: any) => {
     const paymentContract = usePaymentContract();
@@ -177,65 +176,67 @@ const PayRequest = (props: Props, ref: any) => {
         },
     ];
     return (
-        <div className={styles.payRequest} ref={ref}>
-            <div className={styles.logo}>
-                <Image alt='' src={logo} />
-                <div className={styles.companyInfo}>
-                    <h2>CÔNG TY CỔ PHẦN TÂN PHONG</h2>
-                    <div className={styles.address}>
-                        <p style={{ textAlign: 'center' }}>Địa chỉ: Khu 15, TT Hùng Sơn, Huyện Lâm Thao, Tỉnh Phú Thọ</p>
-                        <p className={styles.connect}>{'Website: www.tanphonggroup.com.vn    Email: tanphongtea@gmail.com'}</p>
-                        <p>Tel:  {'(+84) 904 527 527'}</p>
-                    </div>
-                </div>
-            </div>
-            <div className={styles.notiPayrequest}>
-                <div className={styles.backgroundColor}></div>
-                <div className={styles.contentNoti}>
-                    <h2 style={{ marginBottom: '0.3rem' }}>ĐỀ NGHỊ THANH TOÁN</h2>
-                    <p>Số: <i>{props.noPayrequest}</i></p>
-                </div>
-            </div>
-            <p className={styles.date}>
-                <i>Phú Thọ, Ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</i>
-            </p>
-            <div className={styles.contentDocPayment}>
-                <p className={`text-center`}>
-                    <u><i>Kính gửi</i></u>: <b>{crrContract?.ten}</b>
-                </p>
-                <ul>
-                    <li>Căn cứ hợp đồng số: {crrContract && <>{crrContract?.sohd} Ngày {new Date(crrContract?.ngayghi).getDate()} tháng {new Date(crrContract?.ngayghi).getMonth() + 1} năm {new Date(crrContract?.ngayghi).getFullYear()}</>};</li>
-                    <li>Căn cứ tình hình hoạt động và sử dụng các dịch vụ cung cấp tại Cụm công nghiệp Đồng Lạng, xã Phú Ninh, huyện Phù Ninh, tỉnh Phú Thọ.</li>
-                    <li>Căn cứ vào các biên bản nghiệm thu khối lượng sử dụng và các bảng xác định giá trị khối lượng sử dụng hoàn thành theo Thông báo phí dịch vụ số {props.noNoti};</li>
-                </ul>
-                <p>Công ty Cổ Phần Tân Phong xin đề nghị Quý {crrContract?.ten} thanh toán tiền phí sử dụng dịch vụ tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()} với nội dung như sau:</p>
-                <Table
-                    className={styles.tableView}
-                    columns={columns}
-                    dataSource={crrDataPayment}
-                    pagination={false}
-                    bordered
-                />
-                <p style={{ textAlign: 'right', marginTop: '1.2rem', marginBottom: '1.2rem' }}>(Bằng chữ: <i>{numberToVNWords(crrDataPayment?.[crrDataPayment?.length - 1]?.tiensauthue as number)} đồng</i>)</p>
-                <ul className={styles.bank}>
-                    <li>Tên tài khoản: <b>CÔNG TY CỔ PHẦN TÂN PHONG</b></li>
-                    <li>Số tài khoản: <b>0801 000 000 666 tại Ngân hàng Thương mại cổ phần Ngoại thương Việt Nam- Chi nhánh Phú Thọ, tỉnh Phú Thọ ( Vietcombank)</b>
-                    </li>
-                    <li>Đề nghị Quý Công ty quyết toán cho chúng tôi theo thông báo này bằng tiền mặt hoặc chuyển khoản trước ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</li>
-                </ul>
-                <p>Sau ngày này nếu chưa thanh toán. Công ty Cổ phần Tân Phong sẽ ngưng cung cấp các dịch vụ trên</p>
-                <p>Rất mong nhận được sự xem xét của Quý {crrContract?.ten}!</p>
-                <div className={styles.end}>
-                    <div className={styles.from}>
-                        Nơi gửi:
-                        <div className='text-center'>
-                            Như trên
-                            <br />
-                            Lưu văn thư
+        <div ref={ref}>
+            <div className={styles.payRequest} id={props.id} >
+                <div className={styles.logo}>
+                    <img alt='' src={`/hp.png`} className={styles.imgLogo} />
+                    <div className={styles.companyInfo}>
+                        <h2>CÔNG TY CỔ PHẦN TÂN PHONG</h2>
+                        <div className={styles.address}>
+                            <p style={{ textAlign: 'center' }}>Địa chỉ: Khu 15, TT Hùng Sơn, Huyện Lâm Thao, Tỉnh Phú Thọ</p>
+                            <p className={styles.connect}>{'Website: www.tanphonggroup.com.vn    Email: tanphongtea@gmail.com'}</p>
+                            <p>Tel:  {'(+84) 904 527 527'}</p>
                         </div>
                     </div>
-                    <div className={styles.signCompany}>
-                        CÔNG TY CỔ PHẦN TÂN PHONG
+                </div>
+                <div className={styles.notiPayrequest}>
+                    <div className={styles.backgroundColor}></div>
+                    <div className={styles.contentNoti}>
+                        <h2 style={{ marginBottom: '0.3rem' }}>ĐỀ NGHỊ THANH TOÁN</h2>
+                        <p>Số: <i>{props.noPayrequest}</i></p>
+                    </div>
+                </div>
+                <p className={styles.date}>
+                    <i>Phú Thọ, Ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</i>
+                </p>
+                <div className={styles.contentDocPayment}>
+                    <p className={`text-center`}>
+                        <u><i>Kính gửi</i></u>: <b>{crrContract?.ten}</b>
+                    </p>
+                    <ul>
+                        <li>Căn cứ hợp đồng số: {crrContract && <>{crrContract?.sohd} Ngày {new Date(crrContract?.ngayghi).getDate()} tháng {new Date(crrContract?.ngayghi).getMonth() + 1} năm {new Date(crrContract?.ngayghi).getFullYear()}</>};</li>
+                        <li>Căn cứ tình hình hoạt động và sử dụng các dịch vụ cung cấp tại Cụm công nghiệp Đồng Lạng, xã Phú Ninh, huyện Phù Ninh, tỉnh Phú Thọ.</li>
+                        <li>Căn cứ vào các biên bản nghiệm thu khối lượng sử dụng và các bảng xác định giá trị khối lượng sử dụng hoàn thành theo Thông báo phí dịch vụ số {props.noNoti};</li>
+                    </ul>
+                    <p>Công ty Cổ Phần Tân Phong xin đề nghị Quý {crrContract?.ten} thanh toán tiền phí sử dụng dịch vụ tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()} với nội dung như sau:</p>
+                    <Table
+                        className={styles.tableView}
+                        columns={columns}
+                        dataSource={crrDataPayment}
+                        pagination={false}
+                        bordered
+                    />
+                    <p style={{ textAlign: 'right', marginTop: '1.2rem', marginBottom: '1.2rem' }}>(Bằng chữ: <i>{numberToVNWords(crrDataPayment?.[crrDataPayment?.length - 1]?.tiensauthue as number)} đồng</i>)</p>
+                    <ul className={styles.bank}>
+                        <li>Tên tài khoản: <b>CÔNG TY CỔ PHẦN TÂN PHONG</b></li>
+                        <li>Số tài khoản: <b>0801 000 000 666 tại Ngân hàng Thương mại cổ phần Ngoại thương Việt Nam- Chi nhánh Phú Thọ, tỉnh Phú Thọ ( Vietcombank)</b>
+                        </li>
+                        <li>Đề nghị Quý Công ty quyết toán cho chúng tôi theo thông báo này bằng tiền mặt hoặc chuyển khoản trước ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</li>
+                    </ul>
+                    <p>Sau ngày này nếu chưa thanh toán. Công ty Cổ phần Tân Phong sẽ ngưng cung cấp các dịch vụ trên</p>
+                    <p>Rất mong nhận được sự xem xét của Quý {crrContract?.ten}!</p>
+                    <div className={styles.end}>
+                        <div className={styles.from}>
+                            Nơi gửi:
+                            <div className='text-center'>
+                                Như trên
+                                <br />
+                                Lưu văn thư
+                            </div>
+                        </div>
+                        <div className={styles.signCompany}>
+                            CÔNG TY CỔ PHẦN TÂN PHONG
+                        </div>
                     </div>
                 </div>
             </div>

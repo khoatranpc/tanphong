@@ -11,6 +11,7 @@ import styles from './DocumentPayment.module.scss';
 interface Props {
     noNoti: string;
     ref: React.RefObject<any>;
+    id: string;
 }
 const DocumentNoticontract = (props: Props, ref: any) => {
     const contract = useContract();
@@ -194,10 +195,10 @@ const DocumentNoticontract = (props: Props, ref: any) => {
         },
     ];
     return (
-        <div className={styles.documentPayment}>
+        <div className={styles.documentPayment} id={props.id} ref={ref}>
             {!props.noNoti ? <p>Lựa chọn danh sách mã đề nghị để xem văn bản hoặc tạo thông tin văn bản mới!</p> :
                 <div className={`boundary ${styles.boundary}`}>
-                    <div className={`document ${styles.document}`} ref={ref}>
+                    <div className={`document ${styles.document}`}>
                         <div className={`flex headerNotiDoc ${styles.headerNotiDoc} ${styles.flex} `}>
                             <div className={`flex directionColumn ${styles.flex} ${styles.directionColumn} `}>
                                 <h3>
@@ -253,7 +254,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
                     </div>
                 </div>
             }
-        </div >
+        </div>
     )
 }
 

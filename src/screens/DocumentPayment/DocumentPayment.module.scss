@@ -39,7 +39,7 @@
         padding-bottom: 1.8rem;
         position: relative;
 
-        span {
+        span.itemTab {
             display: inline-block;
             width: fit-content;
             font-size: 1.8rem;
@@ -89,7 +89,7 @@
         flex: 1;
         display: flex;
         flex-direction: column;
-        max-width: 70%;
+        width: 70%;
         margin: auto;
 
         .headerNotiDoc {
@@ -160,6 +160,10 @@
 
 .payRequest {
     padding-top: 5.2rem;
+
+    .imgLogo {
+        width: 20rem;
+    }
 
     .logo {
         padding: 0 5.2rem;
