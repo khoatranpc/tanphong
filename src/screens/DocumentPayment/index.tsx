@@ -10,7 +10,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // Gán các font cho pdfmake
 import { useParams } from 'next/navigation';
 import { Button } from 'antd';
-import { PrinterOutlined } from '@ant-design/icons';
+import { MailOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
 import { ResultHook, toastify, uuid } from '@/utils';
@@ -71,7 +71,6 @@ const BoudaryComponent = (props: Props) => {
             pdf.addImage(imgData, '', 0, crrDoc === Document.NOTI_CONTRACT ? 12 : 0, pdfWidth, 0);
             // pdf.save(noNotiContract);
             const pdfBlob = pdf.output('blob');
-            handlePrint();
             const formData = new FormData();
             formData.append('file', pdfBlob, `${noNotiContract}.pdf`);
             formData.append('mahopdong', noNotiContract)
@@ -161,17 +160,29 @@ const BoudaryComponent = (props: Props) => {
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
-                    {crrDoc && <Button
-                        style={{ marginLeft: 'auto' }}
-                        onClick={() => {
-                            if (docRef.current) {
-                                generatePdf();
-                            }
-                        }}
-                        loading={sendmailBillContract.state.isLoading}
-                    >
-                        <PrinterOutlined />
-                    </Button>}
+                    {crrDoc && <div style={{ marginLeft: 'auto' }}>
+                        <Button
+                            onClick={() => {
+                                if (docRef.current) {
+                                    generatePdf();
+                                }
+                            }}
+                            loading={sendmailBillContract.state.isLoading}
+                        >
+                            <MailOutlined />
+                        </Button>
+                        <Button
+                            style={{ marginLeft: '1.2rem' }}
+                            onClick={() => {
+                                if (docRef.current) {
+                                    handlePrint();
+                                }
+                            }}
+                        >
+                            <PrinterOutlined />
+                        </Button>
+                    </div>
+                    }
                 </div>
                 {contentDoc[crrDoc]}
             </div>
