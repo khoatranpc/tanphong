@@ -9,7 +9,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // Gán các font cho pdfmake
 import { useParams } from 'next/navigation';
-import { Button } from 'antd';
+import { Button, Input } from 'antd';
 import { MailOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
@@ -50,6 +50,7 @@ const BoudaryComponent = (props: Props) => {
     const service = useService();
     const docRef = useRef(null);
     const sendmailBillContract = useSendMailBillContract();
+    const [email, setEmail] = useState('');
     const handlePrint = useReactToPrint({
         content: () => docRef.current,
         bodyClass: 'printPageBill'
@@ -73,7 +74,8 @@ const BoudaryComponent = (props: Props) => {
             const pdfBlob = pdf.output('blob');
             const formData = new FormData();
             formData.append('file', pdfBlob, `${noNotiContract}.pdf`);
-            formData.append('mahopdong', noNotiContract)
+            formData.append('mahopdong', noNotiContract);
+            formData.append('email', email);
             sendmailBillContract.post?.(undefined, {
                 body: formData,
                 headers: {
@@ -102,7 +104,7 @@ const BoudaryComponent = (props: Props) => {
     }, []);
     useEffect(() => {
         if (sendmailBillContract.state.data) {
-            if (sendmailBillContract.state.success) {
+            if (sendmailBillContract.state.data?.success) {
                 toastify('Đã gửi thông báo tới khách hàng!', {
                     type: 'success'
                 });
@@ -160,7 +162,15 @@ const BoudaryComponent = (props: Props) => {
                             {DocumentLabel[item as Document]}
                         </span>
                     })}
-                    {crrDoc && <div style={{ marginLeft: 'auto' }}>
+                    {crrDoc && <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                        <Input
+                            size="small"
+                            placeholder="Nhập email cần gửi"
+                            value={email}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                            }}
+                        />
                         <Button
                             onClick={() => {
                                 if (docRef.current) {
