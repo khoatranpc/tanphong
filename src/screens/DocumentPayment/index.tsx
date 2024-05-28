@@ -67,10 +67,10 @@ const BoudaryComponent = (props: Props) => {
         if (content) {
             const canvas = await html2canvas(content);
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF(crrDoc === Document.NOTI_CONTRACT ? 'l' : 'p', 'mm', 'a4');
+            const pdf = new jsPDF('p', 'mm', 'a4');
             const pdfWidth = pdf.internal.pageSize.getWidth();
             pdf.addImage(imgData, '', 0, crrDoc === Document.NOTI_CONTRACT ? 12 : 0, pdfWidth, 0);
-            // pdf.save(noNotiContract);
+            pdf.save(noNotiContract);
             const pdfBlob = pdf.output('blob');
             const formData = new FormData();
             formData.append('file', pdfBlob, `${noNotiContract}.pdf`);
