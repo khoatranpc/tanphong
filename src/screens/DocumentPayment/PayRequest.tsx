@@ -175,6 +175,19 @@ const PayRequest = (props: Props, ref: any) => {
             }
         },
     ];
+
+    const today = new Date();
+
+    // Cộng thêm 5 ngày vào ngày hiện tại
+    const futureDate = new Date(today);
+    futureDate.setDate(today.getDate() + 5);
+
+    // Lấy thông tin ngày, tháng, năm sau khi đã cộng thêm 5 ngày
+    const day = futureDate.getDate();
+    const month = futureDate.getMonth() + 1; // getMonth() trả về giá trị từ 0-11, nên cần +1
+    const year = futureDate.getFullYear();
+
+    console.log(`Ngày sau khi cộng thêm 5 ngày: ${day}/${month}/${year}`);
     return (
         <div ref={ref}>
             <div className={styles.payRequest} id={props.id} >
@@ -221,7 +234,7 @@ const PayRequest = (props: Props, ref: any) => {
                         <li>Tên tài khoản: <b>CÔNG TY CỔ PHẦN TÂN PHONG</b></li>
                         <li>Số tài khoản: <b>0801 000 000 666 tại Ngân hàng Thương mại cổ phần Ngoại thương Việt Nam- Chi nhánh Phú Thọ, tỉnh Phú Thọ ( Vietcombank)</b>
                         </li>
-                        <li>Đề nghị Quý Công ty quyết toán cho chúng tôi theo thông báo này bằng tiền mặt hoặc chuyển khoản trước ngày {new Date().getDate()} tháng {new Date().getMonth() + 1} năm {new Date().getFullYear()}</li>
+                        <li>Đề nghị Quý Công ty quyết toán cho chúng tôi theo thông báo này bằng tiền mặt hoặc chuyển khoản trước ngày {day} tháng {month} năm {year}</li>
                     </ul>
                     <p>Sau ngày này nếu chưa thanh toán. Công ty Cổ phần Tân Phong sẽ ngưng cung cấp các dịch vụ trên</p>
                     <p>Rất mong nhận được sự xem xét của Quý {crrContract?.ten}!</p>
