@@ -83,6 +83,23 @@ const numberToVNWords = (n: number) => {
     return lastWords.charAt(0).toUpperCase() + lastWords.slice(1);
 }
 
+const numberWithDecimalToVNWords = (n: number) => {
+    if (!!n) {
+        if (n === 0) return "Không";
+        const [integerPart, decimalPart] = n.toString().split('.');
+        let words = numberToVNWords(parseInt(integerPart));
+        if (decimalPart) {
+            words += " phẩy";
+            for (const digit of decimalPart) {
+                words += " " + units[parseInt(digit)];
+            }
+        }
+
+        return words.trim();
+    }
+    return "Không";
+}
+
 const createHookReducer = (name: keyof typeof rootReducer, queryThunk?: {
     get?: Function;
     post?: Function;
@@ -134,5 +151,5 @@ export {
     uuid,
     formatDateToString,
     toastify,
-    numberToVNWords
+    numberWithDecimalToVNWords
 }

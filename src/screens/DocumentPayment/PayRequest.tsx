@@ -4,7 +4,7 @@ import { Table } from 'antd';
 import { useParams } from 'next/navigation';
 import { ColumnsType } from 'antd/es/table';
 import { Obj } from '@/global';
-import { numberToVNWords, uuid } from '@/utils';
+import { numberWithDecimalToVNWords, uuid } from '@/utils';
 import { useContract, usePaymentContract, useService } from '@/utils/hooks';
 import styles from './DocumentPayment.module.scss';
 
@@ -216,7 +216,7 @@ const PayRequest = (props: Props, ref: any) => {
                         pagination={false}
                         bordered
                     />
-                    <p style={{ textAlign: 'right', marginTop: '1.2rem', marginBottom: '1.2rem' }}>(Bằng chữ: <i>{numberToVNWords(crrDataPayment?.[crrDataPayment?.length - 1]?.tiensauthue as number)} đồng</i>)</p>
+                    <p style={{ textAlign: 'right', marginTop: '1.2rem', marginBottom: '1.2rem' }}>(Bằng chữ: <i>{numberWithDecimalToVNWords(crrDataPayment?.[crrDataPayment?.length - 1]?.tiensauthue as number)} đồng</i>)</p>
                     <ul className={styles.bank}>
                         <li>Tên tài khoản: <b>CÔNG TY CỔ PHẦN TÂN PHONG</b></li>
                         <li>Số tài khoản: <b>0801 000 000 666 tại Ngân hàng Thương mại cổ phần Ngoại thương Việt Nam- Chi nhánh Phú Thọ, tỉnh Phú Thọ ( Vietcombank)</b>
