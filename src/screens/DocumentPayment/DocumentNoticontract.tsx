@@ -105,7 +105,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'donvitinh',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             width: 90,
             onCell(data) {
@@ -120,7 +120,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'chisocu',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -134,7 +134,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'chisomoi',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -148,7 +148,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'heso',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -162,7 +162,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'dongia',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -176,7 +176,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'sosudung',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -190,7 +190,7 @@ const DocumentNoticontract = (props: Props, ref: any) => {
             dataIndex: 'tientruocthue',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
         },
     ];

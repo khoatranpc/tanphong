@@ -136,7 +136,7 @@ const PayRequest = (props: Props, ref: any) => {
             dataIndex: 'tientruocthue',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -150,7 +150,7 @@ const PayRequest = (props: Props, ref: any) => {
             dataIndex: 'thue',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(data) {
                 return {
@@ -164,7 +164,7 @@ const PayRequest = (props: Props, ref: any) => {
             dataIndex: 'tiensauthue',
             className: 'text-center',
             render(value, record, index) {
-                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : value) : ''
+                return value ? (Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : value) : ''
             },
             onCell(_, idx) {
                 return {

@@ -46,7 +46,7 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     dataIndex: 'tongthu',
                     title: 'Tổng thu',
                     render(value: any) {
-                        return Number(value) ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : '';
+                        return Number(value) ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : '';
                     },
                     className: 'text-right',
                 },
@@ -136,7 +136,7 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     className: 'text-center',
                     title: 'Diện tích | Người',
                     render(value) {
-                        return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : ''
+                        return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''
                     },
                     onCell() {
                         return {
@@ -156,7 +156,7 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                         }
                     },
                     render(value) {
-                        return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : ''
+                        return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''
                     },
                     width: 250
                 },
@@ -248,7 +248,7 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     dataIndex: 'nguyengia',
                     title: 'Nguyên giá',
                     render(value) {
-                        return value ? Number(value).toLocaleString(undefined, { minimumIntegerDigits: 2 }) : ''
+                        return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''
                     }
                 },
                 {
