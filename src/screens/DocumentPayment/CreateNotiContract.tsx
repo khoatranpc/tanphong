@@ -218,7 +218,6 @@ const NotiContract = (props: Props, ref: any) => {
             className: 'text-center',
             render(_, record: any, index) {
                 return <Button
-                    disabled={props.isCreate}
                     size="small"
                     danger
                     onClick={() => {
