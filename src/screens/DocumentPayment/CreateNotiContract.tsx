@@ -221,11 +221,17 @@ const NotiContract = (props: Props, ref: any) => {
                     size="small"
                     danger
                     onClick={() => {
+                        console.log(record);
                         if (!isViewDoc) {
                             if (crrCT?.[index]) {
-                                paymentContract.delete?.(componentId.current, {
-                                    params: [record.id]
-                                }, undefined, undefined, 'DELETE');
+                                if (record.id) {
+                                    paymentContract.delete?.(componentId.current, {
+                                        params: [record.id]
+                                    }, undefined, undefined, 'DELETE');
+                                } else {
+                                    values.splice(index, 1);
+                                    setValues([...values]);
+                                }
                             } else {
                                 values.splice(index, 1);
                                 setValues([...values]);
