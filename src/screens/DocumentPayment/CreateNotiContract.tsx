@@ -45,6 +45,7 @@ const NotiContract = (props: Props, ref: any) => {
             key: uuid()
         }
     }) as Obj[];
+    console.log(crrCT);
     const componentId = useRef(uuid());
     const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
     const [isViewDoc, setIsViewDoc] = useState(false);
@@ -338,7 +339,7 @@ const NotiContract = (props: Props, ref: any) => {
                 isViewDoc ?
                     <DocumentNoticontract noNoti={props.noNoti} ref={ref} id={props.id} /> :
                     <div className={styles.content}>
-                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: {props.noNoti ? props.noNoti : <Input size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
+                        <div className={`${styles.flex} ${styles.no}`}>Ký hiệu TBDV: {props.noNoti ? props.noNoti : <Input disabled={!crrCT} size="small" style={{ marginLeft: '0.8rem', outline: 'none', width: '60rem' }} value={signCompany} onChange={(e) => {
                             setSignCompany(e.target.value);
                         }} />}</div>
                         <div className={styles.table}>
@@ -350,9 +351,14 @@ const NotiContract = (props: Props, ref: any) => {
                                             key: uuid(),
                                             dichvu: '',
                                             sosudung: 1,
-                                            id_hopdongthanhtoan: dataPaymentContract?.id
+                                            id_hopdongthanhtoan: dataPaymentContract?.id,
+                                            chisocu: 1,
+                                            heso: 1,
+                                            chisomoi: 1,
+                                            dongia: 1,
                                         }]);
                                     }}
+                                    disabled={!crrCT}
                                 >
                                     Thêm
                                 </Button>
@@ -376,12 +382,16 @@ const NotiContract = (props: Props, ref: any) => {
                                         console.log(value);
                                         setDiscount(value ?? 0);
                                     }}
+                                    disabled={!crrCT}
                                 />
                             </div>
                             <div style={{ textAlign: 'right', marginTop: '1.2rem' }}>
-                                <Button size="small" onClick={() => {
-                                    handleSubmit();
-                                }}
+                                <Button
+                                    size="small"
+                                    disabled={!crrCT}
+                                    onClick={() => {
+                                        handleSubmit();
+                                    }}
                                     loading={paymentContract.state.isLoading}
                                 >
                                     Lưu

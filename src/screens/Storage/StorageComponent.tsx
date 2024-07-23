@@ -336,6 +336,7 @@ const StorageComponent = (props: StorageComponentProps) => {
                 />
             </div>
             {modal.open && <Modal
+                rootComponentId={props.componentId}
                 modalProps={{
                     open: modal.open,
                     centered: true,

@@ -18,6 +18,7 @@ interface Props {
     id?: string | number;
     typeModal: 'VIEW' | 'CREATE';
     closeModal: () => void;
+    rootComponentId: string;
 }
 const schema: Record<Storages, Obj> = {
     CONTRACT: {
@@ -99,6 +100,7 @@ const Modal = (props: Props) => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
     const updateManyContractService = useUpdateManyContractService();
+    console.log(contractService.state.data);
 
     const dataState: Record<Storages, ResultHook> = {
         CONTRACT: contractStorage,
@@ -612,6 +614,9 @@ const Modal = (props: Props) => {
             if (props.typeModal === 'VIEW') {
                 if (updateManyContractService.state.success && (values.contractServices as Obj[])?.length !== 0) {
                     handleToast(updateManyContractService, 'Cập nhật hợp đồng thành công!');
+                    // query
+                    contractService.get?.(props.rootComponentId);
+                    updateManyContractService.clear();
                 }
             }
         }
