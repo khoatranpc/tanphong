@@ -32,6 +32,7 @@ const NotiContract = (props: Props, ref: any) => {
     const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
     const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId))?.map((item) => {
         return {
+            sosudung: 1,
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => {
                 return String(sv.id_dichvu) === String(item.id_dichvu)
@@ -40,12 +41,12 @@ const NotiContract = (props: Props, ref: any) => {
         }
     }) : (dataPaymentContract?.thanhtoan as Obj[])?.map((item) => {
         return {
+            sosudung: 1,
             ...item,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.id_dichvu,
             key: uuid()
         }
     }) as Obj[];
-    console.log(crrCT);
     const componentId = useRef(uuid());
     const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
     const [isViewDoc, setIsViewDoc] = useState(false);
@@ -57,7 +58,6 @@ const NotiContract = (props: Props, ref: any) => {
             return {
                 dichvu: item?.id_dichvu,
                 key: uuid(),
-                sosudung: 1,
                 ...item,
             }
         }),
@@ -352,10 +352,6 @@ const NotiContract = (props: Props, ref: any) => {
                                             dichvu: '',
                                             sosudung: 1,
                                             id_hopdongthanhtoan: dataPaymentContract?.id,
-                                            chisocu: 1,
-                                            heso: 1,
-                                            chisomoi: 1,
-                                            dongia: 1,
                                         }]);
                                     }}
                                     disabled={!crrCT}

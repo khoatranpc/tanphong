@@ -1,6 +1,7 @@
 "use client";
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { Obj } from '@/global';
+import { useRouter } from 'next/navigation';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -10,7 +11,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // Gán các font cho pdfmake
 import { useParams } from 'next/navigation';
 import { Button, Input } from 'antd';
-import { MailOutlined, PrinterOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, MailOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
 import { ResultHook, toastify, uuid } from '@/utils';
@@ -50,6 +51,7 @@ const BoudaryComponent = (props: Props) => {
     const service = useService();
     const docRef = useRef(null);
     const sendmailBillContract = useSendMailBillContract();
+    const router = useRouter();
     const [email, setEmail] = useState('');
     const handlePrint = useReactToPrint({
         content: () => docRef.current,
@@ -118,6 +120,11 @@ const BoudaryComponent = (props: Props) => {
     }, [sendmailBillContract.state.data]);
     return (
         <div className={styles.documentPayment}>
+            <div className="row">
+                <Button size="small" onClick={() => {
+                    router.push('/storage');
+                }}><ArrowLeftOutlined />Trở lại</Button>
+            </div>
             <div className={styles.list}>
                 <h2>Danh sách <Button
                     size="small"
