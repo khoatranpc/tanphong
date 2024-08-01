@@ -20,7 +20,7 @@ interface Reducer {
     [k: string]: (state: any, action?: PayloadAction<any>) => void
 }
 
-const initState: State = {
+export const initState: State = {
     state: {
         data: null,
         isLoading: false,
@@ -39,9 +39,9 @@ const createSliceReducer = (nameReducer: string, reducers?: Reducer, asyncThunk?
     return createSlice({
         name: nameReducer,
         initialState: initState,
-        reducers: reducers ?? {
+        reducers: reducers ? reducers : {
             clear(state) {
-                state.data = initState.state;
+                state.state = initState.state;
             }
         },
         ...asyncThunk ? {

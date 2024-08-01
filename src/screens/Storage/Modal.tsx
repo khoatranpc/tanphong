@@ -8,7 +8,7 @@ import { useFormik } from 'formik';
 import { Obj } from '@/global';
 import { ResultHook, formatDateToString, toastify, uuid } from '@/utils';
 import { useContract, useContractService, useProperty, useService, useTypeProperty, useTypeService, useUpdateManyContractService } from '@/utils/hooks';
-import { getColumns, getDataDetail } from './config';
+import { getColumns, getDataDetail, optionUnit } from './config';
 import { Storages, getIdData } from './StorageComponent';
 import styles from './Storage.module.scss';
 
@@ -20,6 +20,7 @@ interface Props {
     closeModal: () => void;
     rootComponentId: string;
 }
+
 const schema: Record<Storages, Obj> = {
     CONTRACT: {
         "ten": yup.string().required('Thiếu tên khách!'),
@@ -100,8 +101,6 @@ const Modal = (props: Props) => {
     const propertyStorage = useProperty();
     const typePropertyStorage = useTypeProperty();
     const updateManyContractService = useUpdateManyContractService();
-    console.log(contractService.state.data);
-
     const dataState: Record<Storages, ResultHook> = {
         CONTRACT: contractStorage,
         SERVICE: serviceStorage,
@@ -211,7 +210,7 @@ const Modal = (props: Props) => {
                     sohd: values.sohd,
                     id_hopdong: values.id_hopdong
                 },
-                dientich_soluong: 0,
+                soluong: 0,
                 dongia: 0,
                 chuthich: ''
             };
@@ -327,7 +326,22 @@ const Modal = (props: Props) => {
                         return {
                             ...col,
                             render(value, record: Obj, idx) {
-                                return col.key === 'id_hopdong' ? value?.sohd : (col.key === 'action' ? <div>
+                                return col.key === 'donvitinh' ? <Select
+                                    value={value}
+                                    size='small'
+                                    style={{ width: '8rem' }}
+                                    options={optionUnit.map((item) => {
+                                        return {
+                                            value: item,
+                                            label: item
+                                        }
+                                    })}
+                                    onChange={(value) => {
+                                        const crrService = values.contractServices[idx];
+                                        crrService[col.key] = value;
+                                        setValues({ ...values });
+                                    }}
+                                /> : (col.key === 'id_hopdong' ? value?.sohd : (col.key === 'action' ? <div>
                                     <Popconfirm
                                         title="Xoá thông tin"
                                         description="Bạn có chắc chắn muốn xoá thông tin?"
@@ -343,6 +357,7 @@ const Modal = (props: Props) => {
                                         <Button danger size="small" loading={getLoading}>Xoá</Button>
                                     </Popconfirm>
                                 </div> : (col.dataIndex === 'id_dichvu' ? <Select
+                                    size='small'
                                     filterOption={filterOptionSelect}
                                     showSearch
                                     style={{ width: '15rem' }}
@@ -357,7 +372,6 @@ const Modal = (props: Props) => {
                                     onChange={(value) => {
                                         const crrService = getDataDetail(value, serviceStorage.state.data, Storages.SERVICE);
                                         (values.contractServices as Obj[])[idx].id_dichvu = crrService;
-                                        console.log((values.contractServices as Obj[])[idx]);
                                         setValues({ ...values });
                                     }}
                                 /> : (col.key !== 'chuthich' ? <InputNumber<number>
@@ -381,8 +395,9 @@ const Modal = (props: Props) => {
                                         crrService[col.key] = e.target.value;
                                         setValues({ ...values });
                                     }}
-                                />))
-                                )
+                                />
+                                ))
+                                ))
                             }
                         }
                     })}
@@ -615,8 +630,8 @@ const Modal = (props: Props) => {
                 if (updateManyContractService.state.success && (values.contractServices as Obj[])?.length !== 0) {
                     handleToast(updateManyContractService, 'Cập nhật hợp đồng thành công!');
                     // query
-                    contractService.get?.(props.rootComponentId);
                     updateManyContractService.clear();
+                    contractService.get?.(props.rootComponentId);
                 }
             }
         }

@@ -10,6 +10,7 @@ import { Obj } from '@/global';
 import { ResultHook, toastify, uuid } from '@/utils';
 import DocumentNoticontract from './DocumentNoticontract';
 import styles from './DocumentPayment.module.scss';
+import { optionUnit } from '../Storage/config';
 
 interface Props {
     noNoti: string;
@@ -34,6 +35,8 @@ const NotiContract = (props: Props, ref: any) => {
         return {
             sosudung: 1,
             ...item,
+            heso: item.heso ?? 1,
+            loaithue: item.loaithue ?? 10,
             dichvu: ((service.state.data as Obj[])?.find(sv => {
                 return String(sv.id_dichvu) === String(item.id_dichvu)
             }))?.id_dichvu,
@@ -43,6 +46,8 @@ const NotiContract = (props: Props, ref: any) => {
         return {
             sosudung: 1,
             ...item,
+            heso: item.heso ?? 1,
+            loaithue: item.loaithue ?? 10,
             dichvu: ((service.state.data as Obj[])?.find(sv => String(sv.id_dichvu) === String(item.dichvu)))?.id_dichvu,
             key: uuid()
         }
@@ -50,7 +55,7 @@ const NotiContract = (props: Props, ref: any) => {
     const componentId = useRef(uuid());
     const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
     const [isViewDoc, setIsViewDoc] = useState(false);
-    const [discount, setDiscount] = useState(0);
+    const [discount, setDiscount] = useState(2);
 
     const isCreated = useRef(false);
     const { values, setValues } = useFormik({
@@ -103,10 +108,21 @@ const NotiContract = (props: Props, ref: any) => {
             title: 'ĐVT',
             dataIndex: 'donvitinh',
             render(value, record, index) {
-                return <Input size="small" placeholder="VD: Tháng, Đồng, USD,..." value={value} onChange={(e) => {
-                    (values[index] as Obj)!.donvitinh = e.target.value;
-                    setValues([...values]);
-                }} />
+                return <Select
+                    value={value}
+                    size='small'
+                    style={{ width: '8rem' }}
+                    options={optionUnit.map((item) => {
+                        return {
+                            value: item,
+                            label: item
+                        }
+                    })}
+                    onChange={(value) => {
+                        (values[index] as Obj)!.donvitinh = value;
+                        setValues([...values]);
+                    }}
+                />
             },
             width: 150
         },
@@ -158,6 +174,7 @@ const NotiContract = (props: Props, ref: any) => {
                         (values[index] as Obj)!.heso = value;
                         setValues([...values]);
                     }}
+                    min={1}
                 />
             },
         },
@@ -192,7 +209,7 @@ const NotiContract = (props: Props, ref: any) => {
                         (values[index] as Obj)!.sosudung = value;
                         setValues([...values]);
                     }}
-                    min={1}
+                    min={0}
                 />
             },
         },
@@ -284,22 +301,6 @@ const NotiContract = (props: Props, ref: any) => {
         }
     }
     useEffect(() => {
-        if (paymentContract.state.data && isCreated.current && props.isUpdate) {
-            isCreated.current = false;
-            if (paymentContract.state.success) {
-                toastify('Lưu thông tin thanh toán thành công!', {
-                    type: 'success'
-                });
-                paymentContract.clear();
-            } else {
-                toastify('Lưu thông tin thất bại, vui lòng thử lại sau!', {
-                    type: 'error'
-                });
-                paymentContract.clear();
-            }
-        }
-    }, [paymentContract.state.data, props.isUpdate]);
-    useEffect(() => {
         setSignCompany(!props.isCreate ? props.noNoti.split("ĐNTT-DV/")[1] : '');
     }, [props.noNoti, props.isCreate]);
     useEffect(() => {
@@ -307,7 +308,7 @@ const NotiContract = (props: Props, ref: any) => {
             setValues([...crrCT as any]);
         }
         if (paymentContract.state.data) {
-            setDiscount(dataPaymentContract?.giamtru ?? 0);
+            setDiscount(dataPaymentContract?.giamtru ?? 2);
         }
     }, [props.isUpdate, props.isCreate, props.noNoti, cT.state.data, paymentContract.state.data]);
     useEffect(() => {
@@ -331,7 +332,19 @@ const NotiContract = (props: Props, ref: any) => {
                 }
             }, undefined, undefined, "GET");
         }
-    }, [tmpDataPayment.state.data]);
+        if (tmpDataPayment.state.data && tmpDataPayment.state.method === 'put' && !tmpDataPayment.state.isLoading) {
+            if (tmpDataPayment.state.success) {
+                toastify('Lưu thông tin thanh toán thành công!', {
+                    type: 'success'
+                });
+            } else {
+                toastify('Lưu thông tin thất bại, vui lòng thử lại sau!', {
+                    type: 'error'
+                });
+            }
+            tmpDataPayment.clear();
+        }
+    }, [tmpDataPayment.state]);
     return (
         <div className={styles.notiContract} >
             {!props.isCreate && <Switch checkedChildren="Chỉnh sửa" unCheckedChildren="Văn bản" className={styles.switch} defaultChecked={!isViewDoc} onChange={(checked) => setIsViewDoc(!checked)} />}
@@ -352,6 +365,8 @@ const NotiContract = (props: Props, ref: any) => {
                                             dichvu: '',
                                             sosudung: 1,
                                             id_hopdongthanhtoan: dataPaymentContract?.id,
+                                            heso: 1,
+                                            loaithue: 10
                                         }]);
                                     }}
                                     disabled={!crrCT}
@@ -367,7 +382,7 @@ const NotiContract = (props: Props, ref: any) => {
                                 loading={getLoading}
                             />
                             <div className={styles.discount}>
-                                <label>Giảm trừ:</label>
+                                <label>Phần trăm giảm trừ:</label>
                                 <InputNumber<number>
                                     formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                                     parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
@@ -375,7 +390,6 @@ const NotiContract = (props: Props, ref: any) => {
                                     value={discount}
                                     min={0}
                                     onChange={(value) => {
-                                        console.log(value);
                                         setDiscount(value ?? 0);
                                     }}
                                     disabled={!crrCT}

@@ -1,8 +1,10 @@
 import React from "react";
 import { AnyObject } from "antd/es/_util/type";
 import { ColumnsType } from "antd/es/table";
+import { Select } from "antd";
 import { Obj } from "@/global";
 import { Storages, getIdData } from "./StorageComponent";
+export const optionUnit = ["KWh", "M3", "M2", "Người", "Xe", "Phòng", "M"];
 
 const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: number) => React.ReactNode): ColumnsType<AnyObject> => {
     switch (typeStorage) {
@@ -131,10 +133,27 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     width: 200
                 },
                 {
+                    key: 'donvitinh',
+                    dataIndex: 'donvitinh',
+                    title: 'Đơn vị tính',
+                    render(value) {
+                        // return value?.donvitinh ?? ''
+                        return <Select
+                            options={optionUnit.map((item) => {
+                                return {
+                                    value: item,
+                                    label: item
+                                }
+                            })}
+                        />
+                    },
+                    width: 250
+                },
+                {
                     key: 'dientich_soluong',
                     dataIndex: 'dientich_soluong',
                     className: 'text-center',
-                    title: 'Diện tích | Người',
+                    title: 'Số lượng',
                     render(value) {
                         return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''
                     },
