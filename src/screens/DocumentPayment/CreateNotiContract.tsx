@@ -35,7 +35,7 @@ const NotiContract = (props: Props, ref: any) => {
     const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
     const crrCT = props.isCreate ? getDataCSfTT?.map((item) => {
         return {
-            sosudung: 1,
+            sosudung: item.soluong ?? 1,
             ...item,
             heso: item.heso ?? 1,
             loaithue: item.loaithue ?? 10,
@@ -46,7 +46,7 @@ const NotiContract = (props: Props, ref: any) => {
         }
     }) : (dataPaymentContract?.thanhtoan as Obj[])?.map((item) => {
         return {
-            sosudung: 1,
+            sosudung: item.soluong ?? 1,
             ...item,
             heso: item.heso ?? 1,
             loaithue: item.loaithue ?? 10,
@@ -59,14 +59,15 @@ const NotiContract = (props: Props, ref: any) => {
     const [isViewDoc, setIsViewDoc] = useState(false);
     const [discount, setDiscount] = useState(2);
     const isCreated = useRef(false);
+    const mapValues = crrCT?.map((item: any, idx) => {
+        return {
+            dichvu: item?.id_dichvu,
+            key: uuid(),
+            ...item,
+        }
+    });
     const { values, setValues } = useFormik({
-        initialValues: crrCT?.map((item: any, idx) => {
-            return {
-                dichvu: item?.id_dichvu,
-                key: uuid(),
-                ...item,
-            }
-        }),
+        initialValues: mapValues,
         onSubmit() {
         }
     });
@@ -90,7 +91,7 @@ const NotiContract = (props: Props, ref: any) => {
                     size="small"
                     filterOption={filterOptionSelect}
                     showSearch
-                    style={{ width: '15rem' }}
+                    style={{ width: '100%' }}
                     placeholder="Chọn dịch vụ"
                     options={(service.state.data as Obj[])?.map((item) => {
                         return {
@@ -140,6 +141,11 @@ const NotiContract = (props: Props, ref: any) => {
                     value={value}
                     onChange={(value) => {
                         (values[index] as Obj)!.chisocu = value;
+                        if (record.id_dichvu === 7 || record.id_dichvu === 32 || record.id_dichvu === 33 || record.id_dichvu == 34) {
+                            if ((values[index] as Obj)!.chisomoi) {
+                                (values[index] as Obj)!.sosudung = Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu);
+                            }
+                        }
                         setValues([...values]);
                     }}
                 />
@@ -157,6 +163,11 @@ const NotiContract = (props: Props, ref: any) => {
                     value={value}
                     onChange={(value) => {
                         (values[index] as Obj)!.chisomoi = value;
+                        if (record.id_dichvu === 7 || record.id_dichvu === 32 || record.id_dichvu === 33 || record.id_dichvu == 34) {
+                            if ((values[index] as Obj)!.chisocu >= 0) {
+                                (values[index] as Obj)!.sosudung = Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu);
+                            }
+                        }
                         setValues([...values]);
                     }}
                 />
@@ -351,7 +362,6 @@ const NotiContract = (props: Props, ref: any) => {
                     type: 'error'
                 });
             }
-            tmpDataPayment.clear();
         }
     }, [tmpDataPayment.state]);
     return (
