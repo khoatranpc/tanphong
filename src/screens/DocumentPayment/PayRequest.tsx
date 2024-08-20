@@ -43,13 +43,7 @@ const PayRequest = (props: Props, ref: any) => {
             coldichvu: 3,
             coltientruocthue: 0,
             colthue: 0,
-            tiensauthue: crrDataPayment?.reduce((prevValue, crrItem) => {
-                return {
-                    tientruocthue: prevValue.tientruocthue + crrItem.tientruocthue
-                }
-            }, {
-                tientruocthue: 0
-            }).tientruocthue,
+            tiensauthue: dataPaymentContract?.tongtientruocthue,
             key: uuid()
         },
         ...Object.keys(groupTax).length ? Object.keys(groupTax).map((item, idx) => {
@@ -68,20 +62,14 @@ const PayRequest = (props: Props, ref: any) => {
             coltientruocthue: 0,
             colthue: 0,
             key: uuid(),
-            tiensauthue: dataPaymentContract?.giamtru
+            tiensauthue: dataPaymentContract?.tien_giamtru
         },
         {
             dichvu: 'Tổng tiền sau thuế',
             coldichvu: 3,
             coltientruocthue: 0,
             colthue: 0,
-            tiensauthue: crrDataPayment?.reduce((prevValue, crrItem) => {
-                return {
-                    tiensauthue: prevValue.tiensauthue + crrItem.tiensauthue
-                }
-            }, {
-                tiensauthue: 0
-            }).tiensauthue,
+            tiensauthue: dataPaymentContract?.tongtiensauthue,
             key: uuid()
         },
         {
@@ -89,13 +77,7 @@ const PayRequest = (props: Props, ref: any) => {
             coldichvu: 3,
             coltientruocthue: 0,
             colthue: 0,
-            tiensauthue: crrDataPayment?.reduce((prevValue, crrItem) => {
-                return {
-                    tiensauthue: prevValue.tiensauthue + crrItem.tiensauthue
-                }
-            }, {
-                tiensauthue: 0
-            }).tiensauthue - dataPaymentContract?.giamtru,
+            tiensauthue: dataPaymentContract?.tongtiensauthue_giamtru,
             key: uuid()
         },
     ];
@@ -187,7 +169,6 @@ const PayRequest = (props: Props, ref: any) => {
     const month = futureDate.getMonth() + 1; // getMonth() trả về giá trị từ 0-11, nên cần +1
     const year = futureDate.getFullYear();
 
-    console.log(`Ngày sau khi cộng thêm 5 ngày: ${day}/${month}/${year}`);
     return (
         <div ref={ref}>
             <div className={styles.payRequest} id={props.id} >

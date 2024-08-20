@@ -5,7 +5,7 @@ import { DefaultOptionType } from 'antd/es/select';
 import { useParams } from 'next/navigation';
 import { Button, Input, InputNumber, Select, Switch, Table } from 'antd';
 import { useFormik } from 'formik';
-import { useContract, useContractService, usePaymentContract, useService } from '@/utils/hooks';
+import { useContract, useContractService, useContractServiceForThanhToan, usePaymentContract, useService } from '@/utils/hooks';
 import { Obj } from '@/global';
 import { ResultHook, toastify, uuid } from '@/utils';
 import DocumentNoticontract from './DocumentNoticontract';
@@ -30,8 +30,10 @@ const NotiContract = (props: Props, ref: any) => {
     const service = useService();
     const paymentContract = props.paymentContract;
     const tmpDataPayment = usePaymentContract();
+    const contractServiceForThanhToan = useContractServiceForThanhToan();
+    const getDataCSfTT = contractServiceForThanhToan.state.data?.data as Obj[];
     const dataPaymentContract = ((paymentContract.state.data as Obj[])?.find(item => String(item.id_hopdong) === String(params?.contractId) && item.sotbdv === props.noNoti)) as Obj;
-    const crrCT = props.isCreate ? (cT.state.data as Obj[])?.filter(item => String(item.id_hopdong) === String(params.contractId))?.map((item) => {
+    const crrCT = props.isCreate ? getDataCSfTT?.map((item) => {
         return {
             sosudung: 1,
             ...item,
@@ -56,7 +58,6 @@ const NotiContract = (props: Props, ref: any) => {
     const [signCompany, setSignCompany] = useState(props.noNoti.split("ĐNTT-DV/")[1] ?? '');
     const [isViewDoc, setIsViewDoc] = useState(false);
     const [discount, setDiscount] = useState(2);
-
     const isCreated = useRef(false);
     const { values, setValues } = useFormik({
         initialValues: crrCT?.map((item: any, idx) => {
@@ -69,6 +70,7 @@ const NotiContract = (props: Props, ref: any) => {
         onSubmit() {
         }
     });
+
     const columns: ColumnsType = [
         {
             key: 'STT',
@@ -303,6 +305,13 @@ const NotiContract = (props: Props, ref: any) => {
     useEffect(() => {
         setSignCompany(!props.isCreate ? props.noNoti.split("ĐNTT-DV/")[1] : '');
     }, [props.noNoti, props.isCreate]);
+    useEffect(() => {
+        contractServiceForThanhToan.get?.(componentId.current, {
+            queryParams: {
+                id_hopdong: params?.contractId
+            }
+        });
+    }, []);
     useEffect(() => {
         if (crrCT) {
             setValues([...crrCT as any]);

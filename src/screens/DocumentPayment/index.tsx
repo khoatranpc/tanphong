@@ -15,7 +15,7 @@ import { ArrowLeftOutlined, MailOutlined, PrinterOutlined } from '@ant-design/ic
 import { useReactToPrint } from 'react-to-print';
 import PayRequest from './PayRequest';
 import { ResultHook, toastify, uuid } from '@/utils';
-import { useContract, useContractService, usePaymentContract, useSendMailBillContract, useService } from '@/utils/hooks';
+import { useContract, useContractService, useContractServiceForThanhToan, usePaymentContract, useSendMailBillContract, useService } from '@/utils/hooks';
 import { groupPaymentByNo } from './config';
 import CreateNotiContract from './CreateNotiContract';
 import styles from './DocumentPayment.module.scss';
@@ -51,6 +51,7 @@ const BoudaryComponent = (props: Props) => {
     const service = useService();
     const docRef = useRef(null);
     const sendmailBillContract = useSendMailBillContract();
+   
     const router = useRouter();
     const [email, setEmail] = useState('');
     const handlePrint = useReactToPrint({

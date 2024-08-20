@@ -5,7 +5,7 @@ import { createAction } from "@reduxjs/toolkit";
 
 export const queryUpdatePaymentContract = createRequest(UPDATE_PAYMENT_CONTRACT, '/hopdongthanhtoan/', 'PUT');
 export const queryCreatePaymentContract = createRequest(CREATE_PAYMENT_CONTRACT, '/hopdongthanhtoan/', 'POST');
-export const queryGetPaymentContract = createRequest(GET_PAYMENT_CONTRACT, '/hopdongthanhtoan/', 'GET');
+export const queryGetPaymentContract = createRequest(GET_PAYMENT_CONTRACT, 'search/hopdongthanhtoan/', 'GET');
 export const queryDeletePaymentContract = createRequest(DELETE_PAYMENT_CONTRACT, '/thanhtoan', 'DELETE');
 const paymentContract = createSliceReducer('paymentContract', undefined, [queryCreatePaymentContract, queryGetPaymentContract, queryUpdatePaymentContract, queryDeletePaymentContract]);
 export const clearPaymentContract = createAction<Obj, string>(`${paymentContract.name}/clears`);

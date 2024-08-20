@@ -201,7 +201,7 @@ const Modal = (props: Props) => {
             });
         }
     });
-
+    console.log(values);
     const handleCreateNewRowCTSV = () => {
         if (props.type == Storages.CONTRACT) {
             const newRecordCTSV = {
@@ -218,6 +218,7 @@ const Modal = (props: Props) => {
             setValues({ ...values });
         }
     };
+    console.log(touched);
     const formData: Record<Storages, React.ReactNode> = {
         CONTRACT: props.type === Storages.CONTRACT ? <>
             <Form.Item>

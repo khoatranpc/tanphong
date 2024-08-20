@@ -150,8 +150,8 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     width: 250
                 },
                 {
-                    key: 'dientich_soluong',
-                    dataIndex: 'dientich_soluong',
+                    key: 'soluong',
+                    dataIndex: 'soluong',
                     className: 'text-center',
                     title: 'Số lượng',
                     render(value) {

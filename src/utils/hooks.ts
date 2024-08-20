@@ -9,6 +9,7 @@ import { clearTypeProperty, queryDeleteTypePropertyStorage, queryGetTypeProperty
 import { clearUpdateManyContractService, queryUpdateManyContractService } from "@/store/reducers/storage/updateManyContractService.reducer";
 import { clearPaymentContract, queryCreatePaymentContract, queryDeletePaymentContract, queryGetPaymentContract, queryUpdatePaymentContract } from "@/store/reducers/storage/paymentContract.reducer";
 import { clearSendmailBillContract, querySendMailBillContract } from "@/store/reducers/sendmail.reducer";
+import { queryContractServiceForThanhToan } from "@/store/reducers/storage/contractServiceForThanhToan.reducer";
 
 const useExample = createHookReducer('exampleReducer', {
     get: QueryGetExample
@@ -70,6 +71,11 @@ const useSendMailBillContract = createHookReducer('sendmailBillContract', {
     post: querySendMailBillContract
 }, clearSendmailBillContract);
 
+
+const useContractServiceForThanhToan = createHookReducer('contractServiceForThanhToan', {
+    get: queryContractServiceForThanhToan
+});
+
 export {
     useExample,
     useContract,
@@ -80,5 +86,6 @@ export {
     useTypeProperty,
     useUpdateManyContractService,
     usePaymentContract,
-    useSendMailBillContract
+    useSendMailBillContract,
+    useContractServiceForThanhToan
 }
