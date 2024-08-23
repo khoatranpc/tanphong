@@ -316,22 +316,24 @@ const Modal = (props: Props) => {
                     min={0}
                 />
             </Form.Item>
-            <Form.Item>
-                <label>Tổng thu <span className='error'>*</span></label>
-                <br />
-                <InputNumber<number>
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
-                    onChange={(value) => {
-                    }}
-                    name='tongthu'
-                    value={values.tongthu}
-                    size="small"
-                    onBlur={handleBlur}
-                    min={0}
-                    style={{ minWidth: '20rem' }}
-                />
-            </Form.Item>
+            {
+                props.typeModal === 'VIEW' && <Form.Item>
+                    <label>Tổng thu <span className='error'>*</span></label>
+                    <br />
+                    <InputNumber<number>
+                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
+                        onChange={(value) => {
+                        }}
+                        name='tongthu'
+                        value={values.tongthu}
+                        size="small"
+                        onBlur={handleBlur}
+                        min={0}
+                        style={{ minWidth: '20rem' }}
+                    />
+                </Form.Item>
+            }
             <Form.Item>
                 <label>Chú thích</label>
                 <Input.TextArea size="small" name="chuthich" value={values.chuthich} onChange={handleChange} />
