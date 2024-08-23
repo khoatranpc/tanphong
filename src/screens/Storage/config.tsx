@@ -30,9 +30,9 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     },
                 },
                 {
-                    key: 'thoigianthue',
-                    dataIndex: 'thoigianthue',
-                    title: 'Thời gian thuê (năm)',
+                    key: 'ngayketthuc',
+                    dataIndex: 'ngayketthuc',
+                    title: 'Ngày kết thúc',
                     className: 'text-right',
                     width: 150
                 },
