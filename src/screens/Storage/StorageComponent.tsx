@@ -142,9 +142,9 @@ const StorageComponent = (props: StorageComponentProps) => {
         T_SV: (item: Obj) => String(item.tenloaidichvu).trim().toLowerCase().includes(searchValue.toLowerCase().trim())
     }
     const getLoading = contractStorage.state.isLoading || serviceStorage.state.isLoading || contractService.state.isLoading || typeService.state.isLoading || propertyStorage.state.isLoading || typePropertyStorage.state.isLoading;
-    const getDataSource = (data[props.typeStorage as Storages] ? data[props.typeStorage as Storages] : [])?.filter((item) => {
+    const getDataSource = (((data[props.typeStorage as Storages] ? (Array.isArray(data[props.typeStorage as Storages]) ? data[props.typeStorage as Storages] : []) : [])))?.filter((item) => {
         return conditionFilter[props.typeStorage as Storages](item);
-    }).map((item, idx) => {
+    })?.map((item, idx) => {
         return {
             ...item,
             key: idx

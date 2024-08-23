@@ -155,7 +155,7 @@ const getColumns = (typeStorage: Storages, actionCell?: (record?: Obj, index?: n
                     className: 'text-center',
                     title: 'Số lượng',
                     render(value) {
-                        return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : ''
+                        return value ? Number(value).toLocaleString(undefined, { maximumFractionDigits: 2 }) : 1
                     },
                     onCell() {
                         return {

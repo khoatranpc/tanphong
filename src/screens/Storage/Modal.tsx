@@ -25,9 +25,9 @@ const schema: Record<Storages, Obj> = {
     CONTRACT: {
         "ten": yup.string().required('Thiếu tên khách!'),
         "sohd": yup.string().required('Thiếu số hợp đồng!'),
-        "thoigianthue": yup.number().required('Thiếu thời gian thuê (năm)!'),
         "kythanhtoan_thang_lan_field": yup.number().required('Thiếu kỳ thanh toán (tháng/lần)!'),
-        "tongthu": yup.number().required('Thiếu tổng tiền thu!'),
+        // "tongthu": yup.number().required('Thiếu tổng tiền thu!'),
+        "tiencoc": yup.number().required('Thiếu tiền cọc!'),
     },
     CT_SV: {},
     PT: {
@@ -52,10 +52,12 @@ const initvalues: Record<Storages, Obj> = {
         "sohd": "",
         "thoigianthue": '',
         "kythanhtoan_thang_lan_field": '',
-        "tongthu": '',
+        "tongthu": 0,
         "chuthich": "",
         "ngayghi": formatDateToString(new Date()),
-        contractServices: []
+        "ngayketthuc": formatDateToString(new Date()),
+        contractServices: [],
+        tiencoc: 0
     },
     SERVICE: {
         id_loaidichvu: '',
@@ -201,7 +203,6 @@ const Modal = (props: Props) => {
             });
         }
     });
-    console.log(values);
     const handleCreateNewRowCTSV = () => {
         if (props.type == Storages.CONTRACT) {
             const newRecordCTSV = {
@@ -210,7 +211,7 @@ const Modal = (props: Props) => {
                     sohd: values.sohd,
                     id_hopdong: values.id_hopdong
                 },
-                soluong: 0,
+                soluong: 1,
                 dongia: 0,
                 chuthich: ''
             };
@@ -218,28 +219,66 @@ const Modal = (props: Props) => {
             setValues({ ...values });
         }
     };
-    console.log(touched);
     const formData: Record<Storages, React.ReactNode> = {
         CONTRACT: props.type === Storages.CONTRACT ? <>
-            <Form.Item>
-                <label>Ngày bắt đầu hợp đồng</label>
-                <br />
-                <DatePicker
-                    name='ngayghi'
-                    size="small"
-                    format={'DD/MM/YYYY'}
-                    onBlur={() => {
-                        setTouched({
-                            ...touched,
-                            ngayghi: true
-                        });
-                    }}
-                    value={dayjs(values.ngayghi)}
-                    onChange={(day) => {
-                        const getDay = day ? day.toDate() : new Date();
-                        setFieldValue('ngayghi', formatDateToString(getDay));
-                    }}
-                />
+            <Form.Item >
+                <div style={{ marginBottom: '1.2rem' }}>
+                    <label>Ngày bắt đầu hợp đồng</label>
+                    <br />
+                    <DatePicker
+                        name='ngayghi'
+                        size="small"
+                        format={'DD/MM/YYYY'}
+                        onBlur={() => {
+                            setTouched({
+                                ...touched,
+                                ngayghi: true
+                            });
+                        }}
+                        value={dayjs(values.ngayghi)}
+                        onChange={(day) => {
+                            const getDay = day ? day.toDate() : new Date();
+                            setFieldValue('ngayghi', formatDateToString(getDay));
+                        }}
+                    />
+                </div>
+                <div style={{ marginBottom: '1.2rem' }}>
+                    <label>Tiền đặt cọc</label>
+                    <br />
+                    <InputNumber<number>
+                        formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
+                        onChange={(value) => {
+                            setFieldValue('tiencoc', value);
+                        }}
+                        name='tiencoc'
+                        value={values.tiencoc}
+                        size="small"
+                        onBlur={handleBlur}
+                        min={0}
+                    />
+                    {errors?.tiencoc && touched?.tiencoc && <p className="error">{errors?.tiencoc as string}</p>}
+                </div>
+                <div style={{ marginBottom: '1.2rem' }}>
+                    <label>Ngày kết thúc</label>
+                    <br />
+                    <DatePicker
+                        name='ngayketthuc'
+                        size="small"
+                        format={'DD/MM/YYYY'}
+                        onBlur={() => {
+                            setTouched({
+                                ...touched,
+                                ngayketthuc: true
+                            });
+                        }}
+                        value={dayjs(values.ngayketthuc)}
+                        onChange={(day) => {
+                            const getDay = day ? day.toDate() : new Date();
+                            setFieldValue('ngayketthuc', formatDateToString(getDay));
+                        }}
+                    />
+                </div>
             </Form.Item>
             <Form.Item>
                 <label>Tên khách <span className='error'>*</span></label>
@@ -259,23 +298,6 @@ const Modal = (props: Props) => {
                 {errors?.sohd && touched?.sohd && <p className="error">{errors?.sohd as string}</p>}
             </Form.Item>
             <Form.Item>
-                <label>Thời gian thuê {'(năm)'} <span className='error'>*</span></label>
-                <br />
-                <InputNumber<number>
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
-                    onChange={(value) => {
-                        setFieldValue('thoigianthue', value);
-                    }}
-                    name='thoigianthue'
-                    value={values.thoigianthue}
-                    size="small"
-                    onBlur={handleBlur}
-                    min={0}
-                />
-                {errors?.thoigianthue && touched?.thoigianthue && <p className="error">{errors?.thoigianthue as string}</p>}
-            </Form.Item>
-            <Form.Item>
                 <label>Kỳ hạn thanh toán {'(tháng/lần)'} <span className='error'>*</span></label>
                 <br />
                 <InputNumber<number>
@@ -290,7 +312,6 @@ const Modal = (props: Props) => {
                     onBlur={handleBlur}
                     min={0}
                 />
-                {errors?.kythanhtoan_thang_lan_field && touched?.kythanhtoan_thang_lan_field && <p className="error">{errors?.kythanhtoan_thang_lan_field as string}</p>}
             </Form.Item>
             <Form.Item>
                 <label>Tổng thu <span className='error'>*</span></label>
@@ -299,7 +320,6 @@ const Modal = (props: Props) => {
                     formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                     parser={(value) => value?.replace(/\$\s?|(,*)/g, '') as unknown as number}
                     onChange={(value) => {
-                        setFieldValue('tongthu', value);
                     }}
                     name='tongthu'
                     value={values.tongthu}
@@ -308,7 +328,6 @@ const Modal = (props: Props) => {
                     min={0}
                     style={{ minWidth: '20rem' }}
                 />
-                {errors?.tongthu && touched?.tongthu && <p className="error">{errors?.tongthu as string}</p>}
             </Form.Item>
             <Form.Item>
                 <label>Chú thích</label>

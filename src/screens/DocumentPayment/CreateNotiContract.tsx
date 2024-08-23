@@ -101,6 +101,12 @@ const NotiContract = (props: Props, ref: any) => {
                     })}
                     onChange={(value) => {
                         (values[idx] as Obj)!.dichvu = value as string;
+                        if (record.dichvu === 7 || record.dichvu === 32 || record.dichvu === 33 || record.dichvu == 34) {
+                            (values[idx] as Obj)!.sosudung = (Number((values[idx] as Obj)!.chisomoi) - Number((values[idx] as Obj)!.chisocu)) * Number((values[idx] as Obj)!.heso ?? 1);
+                        }
+                        if (record.dichvu === 8) {
+                            (values[idx] as Obj)!.sosudung = (Number((values[idx] as Obj)!.chisomoi) - Number((values[idx] as Obj)!.chisocu));
+                        }
                         setValues([...values]);
                     }}
                 /> : ''
@@ -141,10 +147,11 @@ const NotiContract = (props: Props, ref: any) => {
                     value={value}
                     onChange={(value) => {
                         (values[index] as Obj)!.chisocu = value;
-                        if (record.id_dichvu === 7 || record.id_dichvu === 32 || record.id_dichvu === 33 || record.id_dichvu == 34) {
-                            if ((values[index] as Obj)!.chisomoi) {
-                                (values[index] as Obj)!.sosudung = Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu);
-                            }
+                        if (record.dichvu === 7 || record.dichvu === 32 || record.dichvu === 33 || record.dichvu == 34) {
+                            (values[index] as Obj)!.sosudung = (Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu)) * Number((values[index] as Obj)!.heso ?? 1);
+                        }
+                        if (record.dichvu === 8) {
+                            (values[index] as Obj)!.sosudung = (Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu));
                         }
                         setValues([...values]);
                     }}
@@ -163,10 +170,12 @@ const NotiContract = (props: Props, ref: any) => {
                     value={value}
                     onChange={(value) => {
                         (values[index] as Obj)!.chisomoi = value;
-                        if (record.id_dichvu === 7 || record.id_dichvu === 32 || record.id_dichvu === 33 || record.id_dichvu == 34) {
-                            if ((values[index] as Obj)!.chisocu >= 0) {
-                                (values[index] as Obj)!.sosudung = Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu);
-                            }
+                        if (record.dichvu === 7 || record.dichvu === 32 || record.dichvu === 33 || record.dichvu == 34) {
+                            (values[index] as Obj)!.sosudung = (Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu)) * Number((values[index] as Obj)!.heso ?? 1);
+                            console.log((values[index] as Obj)!.sosudung);
+                        }
+                        if (record.dichvu === 8) {
+                            (values[index] as Obj)!.sosudung = (Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu));
                         }
                         setValues([...values]);
                     }}
@@ -185,6 +194,7 @@ const NotiContract = (props: Props, ref: any) => {
                     value={value}
                     onChange={(value) => {
                         (values[index] as Obj)!.heso = value;
+                        (values[index] as Obj)!.sosudung = (Number((values[index] as Obj)!.chisomoi) - Number((values[index] as Obj)!.chisocu)) * Number((values[index] as Obj)!.heso ?? 1);
                         setValues([...values]);
                     }}
                     min={1}
