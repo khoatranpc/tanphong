@@ -55,7 +55,7 @@ const initvalues: Record<Storages, Obj> = {
         "tongthu": 0,
         "chuthich": "",
         "ngayghi": formatDateToString(new Date()),
-        "ngayketthuc": formatDateToString(new Date()),
+        "ngayketthuc": undefined,
         contractServices: [],
         tiencoc: 0
     },
@@ -255,6 +255,9 @@ const Modal = (props: Props) => {
                         value={values.tiencoc}
                         size="small"
                         onBlur={handleBlur}
+                        style={{
+                            width: '300px'
+                        }}
                         min={0}
                     />
                     {errors?.tiencoc && touched?.tiencoc && <p className="error">{errors?.tiencoc as string}</p>}
